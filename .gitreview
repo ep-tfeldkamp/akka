@@ -1,0 +1,6 @@
+[gerrit]
+host=review.zentrale.local
+port=29418
+project=thirdparty/akka/akka
+defaultbranch=2.4.19-dg
+defaultremote=origin
