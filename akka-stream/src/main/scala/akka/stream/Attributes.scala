@@ -11,11 +11,10 @@ import scala.reflect.{ classTag, ClassTag }
 import akka.japi.function
 import akka.stream.impl.StreamLayout._
 import java.net.URLEncoder
-import scala.compat.java8.OptionConverters._
 
 /**
- * Holds attributes which can be used to alter [[akka.stream.scaladsl.Flow]] / [[akka.stream.javadsl.Flow]]
- * or [[akka.stream.scaladsl.GraphDSL]] / [[akka.stream.javadsl.GraphDSL]] materialization.
+ * Holds attributes which can be used to alter [[akka.stream.scaladsl.Flow]]
+ * or [[akka.stream.scaladsl.GraphDSL]] materialization.
  *
  * Note that more attributes for the [[ActorMaterializer]] are defined in [[ActorAttributes]].
  */
@@ -58,7 +57,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
    * If no such attribute exists the `default` value is returned.
    */
   def getFirstAttribute[T <: Attribute](c: Class[T], default: T): T =
-    getFirstAttribute(c).orElse(default)
+    attributeList.collectFirst { case attr if c.isInstance(attr) ⇒ c cast attr }.getOrElse(default)
 
   /**
    * Java API: Get the last (most specific) attribute of a given `Class` or subclass thereof.
@@ -67,12 +66,6 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     Optional.ofNullable(attributeList.foldLeft(
       null.asInstanceOf[T])(
       (acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
-
-  /**
-   * Java API: Get the first (least specific) attribute of a given `Class` or subclass thereof.
-   */
-  def getFirstAttribute[T <: Attribute](c: Class[T]): Optional[T] =
-    attributeList.collectFirst { case attr if c.isInstance(attr) ⇒ c cast attr }.asJava
 
   /**
    * Scala API: get all attributes of a given type (or subtypes thereof).

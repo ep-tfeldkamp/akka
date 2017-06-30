@@ -15,7 +15,7 @@ private[remote] object FastHash {
 
   // Fast hash based on the 128 bit Xorshift128+ PRNG. Mixes in character bits into the random generator state.
   def ofString(s: String): Int = {
-    val chars = Unsafe.instance.getObject(s, EnvelopeBuffer.StringValueFieldOffset).asInstanceOf[Array[Char]]
+    val chars = s.toCharArray
     var s0: Long = 391408
     var s1: Long = 601258
     var i = 0

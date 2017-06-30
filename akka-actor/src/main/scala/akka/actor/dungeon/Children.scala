@@ -90,17 +90,22 @@ private[akka] trait Children { this: ActorCell ⇒
   }
 
   protected def stopFunctionRefs(): Unit = {
-    val refs = Unsafe.instance.getAndSetObject(this, AbstractActorCell.functionRefsOffset, Map.empty).asInstanceOf[Map[String, FunctionRef]]
+    val refs = Unsafe.getAndSetObject(
+      Unsafe.instance,
+      this,
+      AbstractActorCell.functionRefsOffset,
+      Map.empty
+    ).asInstanceOf[Map[String, FunctionRef]]
     refs.valuesIterator.foreach(_.stop())
   }
 
   @volatile private var _nextNameDoNotCallMeDirectly = 0L
   final protected def randomName(sb: java.lang.StringBuilder): String = {
-    val num = Unsafe.instance.getAndAddLong(this, AbstractActorCell.nextNameOffset, 1)
+    val num = Unsafe.getAndAddLong(Unsafe.instance, this, AbstractActorCell.nextNameOffset, 1)
     Helpers.base64(num, sb)
   }
   final protected def randomName(): String = {
-    val num = Unsafe.instance.getAndAddLong(this, AbstractActorCell.nextNameOffset, 1)
+    val num = Unsafe.getAndAddLong(Unsafe.instance, this, AbstractActorCell.nextNameOffset, 1)
     Helpers.base64(num)
   }
 

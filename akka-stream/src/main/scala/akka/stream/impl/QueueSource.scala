@@ -17,9 +17,6 @@ import akka.Done
 import java.util.concurrent.CompletionStage
 
 import akka.annotation.InternalApi
-import akka.util.OptionVal
-
-import scala.compat.java8.FutureConverters._
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -188,14 +185,4 @@ import scala.util.control.NonFatal
       }
     })
   }
-}
-
-/**
- * INTERNAL API
- */
-@InternalApi private[akka] final class SourceQueueAdapter[T](delegate: SourceQueueWithComplete[T]) extends akka.stream.javadsl.SourceQueueWithComplete[T] {
-  def offer(elem: T): CompletionStage[QueueOfferResult] = delegate.offer(elem).toJava
-  def watchCompletion(): CompletionStage[Done] = delegate.watchCompletion().toJava
-  def complete(): Unit = delegate.complete()
-  def fail(ex: Throwable): Unit = delegate.fail(ex)
 }

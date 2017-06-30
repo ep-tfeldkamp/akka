@@ -6,14 +6,12 @@ package akka.routing
 import java.time.LocalDateTime
 
 import scala.collection.immutable
-import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.{ ThreadLocalRandom, TimeUnit }
+
 import scala.concurrent.duration._
-
 import com.typesafe.config.Config
-
 import akka.actor._
 import akka.util.JavaDurationConverters._
-
 import OptimalSizeExploringResizer._
 
 trait OptimalSizeExploringResizer extends Resizer {
@@ -58,8 +56,8 @@ case object OptimalSizeExploringResizer {
       lowerBound = resizerCfg.getInt("lower-bound"),
       upperBound = resizerCfg.getInt("upper-bound"),
       chanceOfScalingDownWhenFull = resizerCfg.getDouble("chance-of-ramping-down-when-full"),
-      actionInterval = resizerCfg.getDuration("action-interval").asScala,
-      downsizeAfterUnderutilizedFor = resizerCfg.getDuration("downsize-after-underutilized-for").asScala,
+      actionInterval = resizerCfg.getDuration("action-interval", TimeUnit.SECONDS).seconds,
+      downsizeAfterUnderutilizedFor = resizerCfg.getDuration("downsize-after-underutilized-for", TimeUnit.HOURS).hours,
       numOfAdjacentSizesToConsiderDuringOptimization = resizerCfg.getInt("optimization-range"),
       exploreStepSize = resizerCfg.getDouble("explore-step-size"),
       explorationProbability = resizerCfg.getDouble("chance-of-exploration"),

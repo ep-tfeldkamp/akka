@@ -3,10 +3,7 @@
  */
 package akka.actor.setup
 
-import java.util.Optional
-
 import scala.annotation.varargs
-import scala.compat.java8.OptionConverters._
 import scala.reflect.ClassTag
 
 /**
@@ -49,13 +46,6 @@ object ActorSystemSetup {
  * instances.
  */
 final class ActorSystemSetup private[akka] (setups: Map[Class[_], AnyRef]) {
-
-  /**
-   * Java API: Extract a concrete [[Setup]] of type `T` if it is defined in the settings.
-   */
-  def get[T <: Setup](clazz: Class[T]): Optional[T] = {
-    setups.get(clazz).map(_.asInstanceOf[T]).asJava
-  }
 
   /**
    * Scala API: Extract a concrete [[Setup]] of type `T` if it is defined in the settings.

@@ -19,8 +19,6 @@ import scala.util.control.NonFatal
 import scala.util.Success
 import akka.dispatch.ExecutionContexts.sameThreadExecutionContext
 
-import scala.compat.java8.FutureConverters
-
 /**
  * Companion object providing factory methods for Circuit Breaker which runs callbacks in caller's thread
  */
@@ -161,27 +159,6 @@ class CircuitBreaker(
   def withCircuitBreaker[T](body: ⇒ Future[T]): Future[T] = currentState.invoke(body)
 
   /**
-   * Java API for [[#withCircuitBreaker]]
-   *
-   * @param body Call needing protected
-   * @return [[scala.concurrent.Future]] containing the call result or a
-   *   `scala.concurrent.TimeoutException` if the call timed out
-   */
-  def callWithCircuitBreaker[T](body: Callable[Future[T]]): Future[T] = withCircuitBreaker(body.call)
-
-  /**
-   * Java API (8) for [[#withCircuitBreaker]]
-   *
-   * @param body Call needing protected
-   * @return [[java.util.concurrent.CompletionStage]] containing the call result or a
-   *   `scala.concurrent.TimeoutException` if the call timed out
-   */
-  def callWithCircuitBreakerCS[T](body: Callable[CompletionStage[T]]): CompletionStage[T] =
-    FutureConverters.toJava[T](callWithCircuitBreaker(new Callable[Future[T]] {
-      override def call(): Future[T] = FutureConverters.toScala(body.call())
-    }))
-
-  /**
    * Wraps invocations of synchronous calls that need to be protected
    *
    * Calls are run in caller's thread. Because of the synchronous nature of
@@ -197,14 +174,6 @@ class CircuitBreaker(
     Await.result(
       withCircuitBreaker(try Future.successful(body) catch { case NonFatal(t) ⇒ Future.failed(t) }),
       callTimeout)
-
-  /**
-   * Java API for [[#withSyncCircuitBreaker]]. Throws [[java.util.concurrent.TimeoutException]] if the call timed out.
-   *
-   * @param body Call needing protected
-   * @return The result of the call
-   */
-  def callWithSyncCircuitBreaker[T](body: Callable[T]): T = withSyncCircuitBreaker(body.call)
 
   /**
    * Mark a successful call through CircuitBreaker. Sometimes the callee of CircuitBreaker sends back a message to the

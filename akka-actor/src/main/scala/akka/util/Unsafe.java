@@ -27,4 +27,49 @@ public final class Unsafe {
             throw new ExceptionInInitializerError(t);
         }
     }
+
+    public static final int getAndAddInt(sun.misc.Unsafe unsafe, Object instance, long fieldOffset, int summand) {
+        int current;
+        do {
+            current = unsafe.getIntVolatile(instance, fieldOffset);
+        } while (!unsafe.compareAndSwapInt(instance, fieldOffset, current, current + summand));
+
+        return current;
+    }
+
+    public static final long getAndAddLong(sun.misc.Unsafe unsafe, Object instance, long fieldOffset, long summand) {
+        long current;
+        do {
+            current = unsafe.getLongVolatile(instance, fieldOffset);
+        } while (!unsafe.compareAndSwapLong(instance, fieldOffset, current, current + summand));
+
+        return current;
+    }
+
+    public static final int getAndSetInt(sun.misc.Unsafe unsafe, Object instance, long fieldOffset, int value) {
+        int current;
+        do {
+            current = unsafe.getIntVolatile(instance, fieldOffset);
+        } while (!unsafe.compareAndSwapInt(instance, fieldOffset, current, value));
+
+        return current;
+    }
+
+    public static final long getAndSetLong(sun.misc.Unsafe unsafe, Object instance, long fieldOffset, long value) {
+        long current;
+        do {
+            current = unsafe.getLongVolatile(instance, fieldOffset);
+        } while (!unsafe.compareAndSwapLong(instance, fieldOffset, current, value));
+
+        return current;
+    }
+
+    public static final Object getAndSetObject(sun.misc.Unsafe unsafe, Object instance, long fieldOffset, Object value) {
+        Object current;
+        do {
+            current = unsafe.getObjectVolatile(instance, fieldOffset);
+        } while (!unsafe.compareAndSwapObject(instance, fieldOffset, current, value));
+
+        return current;
+    }
 }

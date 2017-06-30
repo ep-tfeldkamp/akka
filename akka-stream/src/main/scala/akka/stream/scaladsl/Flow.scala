@@ -259,9 +259,6 @@ final class Flow[-In, +Out, +Mat](override val module: Module)
           override def subscribe(s: Subscriber[_ >: Out]): Unit = pub.subscribe(s)
         }
       }
-
-  /** Converts this Scala DSL element to it's Java DSL counterpart. */
-  def asJava: javadsl.Flow[In, Out, Mat] = new javadsl.Flow(this)
 }
 
 object Flow {
@@ -297,9 +294,8 @@ object Flow {
    */
   def fromGraph[I, O, M](g: Graph[FlowShape[I, O], M]): Flow[I, O, M] =
     g match {
-      case f: Flow[I, O, M]         ⇒ f
-      case f: javadsl.Flow[I, O, M] ⇒ f.asScala
-      case other                    ⇒ new Flow(other.module)
+      case f: Flow[I, O, M] ⇒ f
+      case other            ⇒ new Flow(other.module)
     }
 
   /**

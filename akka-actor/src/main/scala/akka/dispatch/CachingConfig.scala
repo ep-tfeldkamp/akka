@@ -98,8 +98,6 @@ private[akka] class CachingConfig(_config: Config) extends Config {
       config.hasPath(path)
   }
 
-  def hasPathOrNull(path: String): Boolean = config.hasPathOrNull(path)
-
   def isEmpty = config.isEmpty
 
   def entrySet() = config.entrySet()
@@ -175,16 +173,6 @@ private[akka] class CachingConfig(_config: Config) extends Config {
   def getDuration(path: String, unit: TimeUnit) = config.getDuration(path, unit)
 
   def getDurationList(path: String, unit: TimeUnit) = config.getDurationList(path, unit)
-
-  def getDuration(path: String): java.time.Duration = config.getDuration(path)
-
-  def getDurationList(path: String) = config.getDurationList(path)
-
-  def getIsNull(path: String): Boolean = config.getIsNull(path)
-
-  def getMemorySize(path: String) = config.getMemorySize(path)
-
-  def getMemorySizeList(path: String) = config.getMemorySizeList(path)
 
   def isResolved() = config.isResolved()
 

@@ -85,7 +85,7 @@ object TLS {
       engine.setUseClientMode(role == Client)
 
       val finalSessionParameters =
-        if (firstSession.sslParameters.isDefined && hostInfo.isDefined && !config.config.loose.disableSNI) {
+        if (firstSession.sslParameters.isDefined && hostInfo.isDefined) {
           val newParams = TlsUtils.cloneParameters(firstSession.sslParameters.get)
           // In Java 7, SNI was automatically enabled by enabling "jsse.enableSNIExtension" and using
           // `createSSLEngine(hostname, port)`.

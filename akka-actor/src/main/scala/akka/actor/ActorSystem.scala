@@ -22,11 +22,8 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, ExecutionContext, ExecutionContextExecutor, Future, Promise }
 import scala.util.{ Failure, Success, Try }
 import scala.util.control.{ ControlThrowable, NonFatal }
-import java.util.Optional
 
 import akka.actor.setup.{ ActorSystemSetup, Setup }
-
-import scala.compat.java8.OptionConverters._
 
 object BootstrapSetup {
 
@@ -51,14 +48,6 @@ object BootstrapSetup {
    * Scala API: Short for using custom config but keeping default classloader and default execution context
    */
   def apply(config: Config): BootstrapSetup = apply(None, Some(config), None)
-
-  /**
-   * Java API: Create bootstrap settings needed for starting the actor system
-   *
-   * @see [[BootstrapSetup]] for description of the properties
-   */
-  def create(classLoader: Optional[ClassLoader], config: Optional[Config], defaultExecutionContext: Optional[ExecutionContext]): BootstrapSetup =
-    apply(classLoader.asScala, config.asScala, defaultExecutionContext.asScala)
 
   /**
    * Java  API: Short for using custom config but keeping default classloader and default execution context

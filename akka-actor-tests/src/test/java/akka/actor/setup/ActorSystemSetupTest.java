@@ -21,16 +21,4 @@ public class ActorSystemSetupTest extends JUnitSuite {
     }
   }
 
-  @Test
-  public void apiMustBeUsableFromJava() {
-    final JavaSetup javaSetting = new JavaSetup("Jasmine Rice");
-    final Optional<JavaSetup> result = ActorSystemSetup.create()
-        .withSetup(javaSetting)
-        .get(JavaSetup.class);
-
-    assertTrue(result.isPresent());
-    assertEquals(result.get(), javaSetting);
-
-  }
-
 }

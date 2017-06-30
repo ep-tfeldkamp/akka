@@ -18,8 +18,6 @@ import scala.annotation.unchecked.uncheckedVariance
 import scala.collection.immutable
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ Future, Promise }
-import java.util.concurrent.CompletionStage
-import scala.compat.java8.FutureConverters._
 
 /**
  * A `Source` is a set of stream processing steps that has one open output. It can comprise
@@ -155,11 +153,6 @@ final class Source[+Out, +Mat](override val module: Module)
   override def async: Repr[Out] = addAttributes(Attributes.asyncBoundary)
 
   /**
-   * Converts this Scala DSL element to it's Java DSL counterpart.
-   */
-  def asJava: javadsl.Source[Out, Mat] = new javadsl.Source(this)
-
-  /**
    * Combines several sources with fun-in strategy like `Merge` or `Concat` and returns `Source`.
    */
   def combine[T, U](first: Source[T, _], second: Source[T, _], rest: Source[T, _]*)(strategy: Int ⇒ Graph[UniformFanInShape[T, U], NotUsed]): Source[U, NotUsed] =
@@ -226,9 +219,8 @@ object Source {
    * it so also in type.
    */
   def fromGraph[T, M](g: Graph[SourceShape[T], M]): Source[T, M] = g match {
-    case s: Source[T, M]         ⇒ s
-    case s: javadsl.Source[T, M] ⇒ s.asScala
-    case other                   ⇒ new Source(other.module)
+    case s: Source[T, M] ⇒ s
+    case other           ⇒ new Source(other.module)
   }
 
   /**
@@ -251,15 +243,6 @@ object Source {
    */
   def fromFuture[T](future: Future[T]): Source[T, NotUsed] =
     fromGraph(new FutureSource(future))
-
-  /**
-   * Start a new `Source` from the given `Future`. The stream will consist of
-   * one element when the `Future` is completed with a successful value, which
-   * may happen before or after materializing the `Flow`.
-   * The stream terminates with a failure if the `Future` is completed with a failure.
-   */
-  def fromCompletionStage[T](future: CompletionStage[T]): Source[T, NotUsed] =
-    fromGraph(new FutureSource(future.toScala))
 
   /**
    * Elements are emitted periodically with the specified interval.

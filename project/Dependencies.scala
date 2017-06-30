@@ -12,7 +12,6 @@ object Dependencies {
   lazy val scalaTestVersion = settingKey[String]("The version of ScalaTest to use.")
   lazy val scalaStmVersion = settingKey[String]("The version of ScalaSTM to use.")
   lazy val scalaCheckVersion = settingKey[String]("The version of ScalaCheck to use.")
-  lazy val java8CompatVersion = settingKey[String]("The version of scala-java8-compat to use.")
   val junitVersion = "4.12"
   val sslConfigVersion = "0.1.3"
   val aeronVersion = "1.2.5-dg-1.0.0-SNAPSHOT"
@@ -29,13 +28,7 @@ object Dependencies {
           "1.13.2"
       }
     ),
-    scalaTestVersion := "3.0.0",
-    java8CompatVersion := {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, n)) if n >= 12 => "0.8.0"
-        case _ => "0.7.0"
-      }
-    }
+    scalaTestVersion := "3.0.0"
   )
 
   object Compile {
@@ -73,8 +66,6 @@ object Dependencies {
     val junit       = "junit"                         % "junit"                        % junitVersion  // Common Public License 1.0
 
     // For Java 8 Conversions
-    val java8Compat = Def.setting {"org.scala-lang.modules" %% "scala-java8-compat" % java8CompatVersion.value} // Scala License
-    
     val aeronDriver = "io.aeron"                      % "aeron-driver"                 % aeronVersion       // ApacheV2
     val aeronClient = "io.aeron"                      % "aeron-client"                 % aeronVersion       // ApacheV2
 

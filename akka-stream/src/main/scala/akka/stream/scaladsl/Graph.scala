@@ -1074,9 +1074,6 @@ object GraphDSL extends GraphApply {
     }
 
     private[stream] def module: Module = moduleInProgress
-
-    /** Converts this Scala DSL element to it's Java DSL counterpart. */
-    def asJava: javadsl.GraphDSL.Builder[M] = new javadsl.GraphDSL.Builder()(this)
   }
 
   object Implicits {

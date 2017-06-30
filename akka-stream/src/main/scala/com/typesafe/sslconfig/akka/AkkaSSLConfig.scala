@@ -28,7 +28,7 @@ object AkkaSSLConfig extends ExtensionId[AkkaSSLConfig] with ExtensionIdProvider
   override def createExtension(system: ExtendedActorSystem): AkkaSSLConfig =
     new AkkaSSLConfig(system, defaultSSLConfigSettings(system))
 
-  def defaultSSLConfigSettings(system: ActorSystem): SSLConfigSettings = {
+  def defaultSSLConfigSettings(system: ActorSystem): SSLConfig = {
     val akkaOverrides = system.settings.config.getConfig("akka.ssl-config")
     val defaults = system.settings.config.getConfig("ssl-config")
     SSLConfigFactory.parse(akkaOverrides withFallback defaults)
@@ -36,7 +36,7 @@ object AkkaSSLConfig extends ExtensionId[AkkaSSLConfig] with ExtensionIdProvider
 
 }
 
-final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSettings) extends Extension {
+final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfig) extends Extension {
 
   private val mkLogger = new AkkaLoggerFactory(system)
 
@@ -44,7 +44,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
   log.debug("Initializing AkkaSSLConfig extension...")
 
   /** Can be used to modify the underlying config, most typically used to change a few values in the default config */
-  def withSettings(c: SSLConfigSettings): AkkaSSLConfig =
+  def withSettings(c: SSLConfig): AkkaSSLConfig =
     new AkkaSSLConfig(system, c)
 
   /**
@@ -52,7 +52,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
    * Please note that the ActorSystem-wide extension always remains configured via typesafe config,
    * custom ones can be created for special-handling specific connections
    */
-  def mapSettings(f: SSLConfigSettings ⇒ SSLConfigSettings): AkkaSSLConfig =
+  def mapSettings(f: SSLConfig ⇒ SSLConfig): AkkaSSLConfig =
     new AkkaSSLConfig(system, f(config))
 
   /**
@@ -63,7 +63,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
    * Java API
    */
   // Not same signature as mapSettings to allow latter deprecation of this once we hit Scala 2.12
-  def convertSettings(f: java.util.function.Function[SSLConfigSettings, SSLConfigSettings]): AkkaSSLConfig =
+  def convertSettings(f: java.util.function.Function[SSLConfig, SSLConfig]): AkkaSSLConfig =
     new AkkaSSLConfig(system, f.apply(config))
 
   val hostnameVerifier = buildHostnameVerifier(config)
@@ -98,17 +98,17 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
 
   ////////////////// CONFIGURING //////////////////////
 
-  def buildKeyManagerFactory(ssl: SSLConfigSettings): KeyManagerFactoryWrapper = {
+  def buildKeyManagerFactory(ssl: SSLConfig): KeyManagerFactoryWrapper = {
     val keyManagerAlgorithm = ssl.keyManagerConfig.algorithm
     new DefaultKeyManagerFactoryWrapper(keyManagerAlgorithm)
   }
 
-  def buildTrustManagerFactory(ssl: SSLConfigSettings): TrustManagerFactoryWrapper = {
+  def buildTrustManagerFactory(ssl: SSLConfig): TrustManagerFactoryWrapper = {
     val trustManagerAlgorithm = ssl.trustManagerConfig.algorithm
     new DefaultTrustManagerFactoryWrapper(trustManagerAlgorithm)
   }
 
-  def buildHostnameVerifier(conf: SSLConfigSettings): HostnameVerifier = {
+  def buildHostnameVerifier(conf: SSLConfig): HostnameVerifier = {
     val clazz: Class[HostnameVerifier] =
       if (config.loose.disableHostnameVerification) classOf[DisabledComplainingHostnameVerifier].asInstanceOf[Class[HostnameVerifier]]
       else config.hostnameVerifierClass.asInstanceOf[Class[HostnameVerifier]]
@@ -121,7 +121,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
     v
   }
 
-  def validateDefaultTrustManager(sslConfig: SSLConfigSettings) {
+  def validateDefaultTrustManager(sslConfig: SSLConfig) {
     // If we are using a default SSL context, we can't filter out certificates with weak algorithms
     // We ALSO don't have access to the trust manager from the SSLContext without doing horrible things
     // with reflection.
@@ -152,7 +152,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
     }
   }
 
-  def configureProtocols(existingProtocols: Array[String], sslConfig: SSLConfigSettings): Array[String] = {
+  def configureProtocols(existingProtocols: Array[String], sslConfig: SSLConfig): Array[String] = {
     val definedProtocols = sslConfig.enabledProtocols match {
       case Some(configuredProtocols) ⇒
         // If we are given a specific list of protocols, then return it in exactly that order,
@@ -176,7 +176,7 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
     definedProtocols
   }
 
-  def configureCipherSuites(existingCiphers: Array[String], sslConfig: SSLConfigSettings): Array[String] = {
+  def configureCipherSuites(existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) ⇒
         // If we are given a specific list of ciphers, return it in that order.
@@ -200,13 +200,6 @@ final class AkkaSSLConfig(system: ExtendedActorSystem, val config: SSLConfigSett
 
   // LOOSE SETTINGS //
 
-  private def looseDisableSNI(defaultParams: SSLParameters): Unit = if (config.loose.disableSNI) {
-    // this will be logged once for each AkkaSSLConfig
-    log.warning("You are using ssl-config.loose.disableSNI=true! " +
-      "It is strongly discouraged to disable Server Name Indication, as it is crucial to preventing man-in-the-middle attacks.")
-
-    defaultParams.setServerNames(Collections.emptyList())
-    defaultParams.setSNIMatchers(Collections.emptyList())
-  }
+  private def looseDisableSNI(defaultParams: SSLParameters): Unit = ()
 
 }

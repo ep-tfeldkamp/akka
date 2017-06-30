@@ -82,11 +82,6 @@ final class Sink[-In, +Mat](override val module: Module)
    * Put an asynchronous boundary around this `Sink`
    */
   override def async: Sink[In, Mat] = addAttributes(Attributes.asyncBoundary)
-
-  /**
-   * Converts this Scala DSL element to it's Java DSL counterpart.
-   */
-  def asJava: javadsl.Sink[In, Mat] = new javadsl.Sink(this)
 }
 
 object Sink {
@@ -100,9 +95,8 @@ object Sink {
    */
   def fromGraph[T, M](g: Graph[SinkShape[T], M]): Sink[T, M] =
     g match {
-      case s: Sink[T, M]         ⇒ s
-      case s: javadsl.Sink[T, M] ⇒ s.asScala
-      case other                 ⇒ new Sink(other.module)
+      case s: Sink[T, M] ⇒ s
+      case other         ⇒ new Sink(other.module)
     }
 
   /**

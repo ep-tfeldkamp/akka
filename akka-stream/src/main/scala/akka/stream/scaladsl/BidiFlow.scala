@@ -13,8 +13,6 @@ import scala.concurrent.duration.FiniteDuration
 final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](override val module: Module) extends Graph[BidiShape[I1, O1, I2, O2], Mat] {
   override def shape = module.shape.asInstanceOf[BidiShape[I1, O1, I2, O2]]
 
-  def asJava: javadsl.BidiFlow[I1, O1, I2, O2, Mat] = new javadsl.BidiFlow(this)
-
   /**
    * Add the given BidiFlow as the next step in a bidirectional transformation
    * pipeline. By convention protocol stacks are growing to the left: the right most is the bottom
@@ -167,9 +165,8 @@ object BidiFlow {
    */
   def fromGraph[I1, O1, I2, O2, Mat](graph: Graph[BidiShape[I1, O1, I2, O2], Mat]): BidiFlow[I1, O1, I2, O2, Mat] =
     graph match {
-      case bidi: BidiFlow[I1, O1, I2, O2, Mat]         ⇒ bidi
-      case bidi: javadsl.BidiFlow[I1, O1, I2, O2, Mat] ⇒ bidi.asScala
-      case other                                       ⇒ new BidiFlow(other.module)
+      case bidi: BidiFlow[I1, O1, I2, O2, Mat] ⇒ bidi
+      case other                               ⇒ new BidiFlow(other.module)
     }
 
   /**

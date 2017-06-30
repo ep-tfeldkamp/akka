@@ -25,7 +25,7 @@ object OSGi {
     OsgiKeys.exportPackage := Seq("akka*"),
     OsgiKeys.privatePackage := Seq("akka.osgi.impl"),
     //akka-actor packages are not imported, as contained in the CP
-    OsgiKeys.importPackage := (osgiOptionalImports map optionalResolution) ++ Seq("!sun.misc", scalaJava8CompatImport(), scalaVersion(scalaImport).value, configImport(), "*"),
+    OsgiKeys.importPackage := (osgiOptionalImports map optionalResolution) ++ Seq("!sun.misc", scalaVersion(scalaImport).value, configImport(), "*"),
     // dynamicImportPackage needed for loading classes defined in configuration
     OsgiKeys.dynamicImportPackage := Seq("*")
   )
@@ -55,7 +55,7 @@ object OSGi {
   val parsing = exports(Seq("akka.parboiled2.*", "akka.shapeless.*"),
     imports = Seq(optionalResolution("scala.quasiquotes")))
 
-  val httpCore = exports(Seq("akka.http.*"), imports = Seq(scalaJava8CompatImport()))
+  val httpCore = exports(Seq("akka.http.*"), imports = Seq())
 
   val http = exports(Seq("akka.http.impl.server") ++ 
     Seq(
@@ -65,28 +65,23 @@ object OSGi {
       "akka.http.$DSL$.common.*",
       "akka.http.$DSL$.marshalling.*",
       "akka.http.$DSL$.unmarshalling.*"
-    ) flatMap { p =>
-      Seq(p.replace("$DSL$", "scaladsl"), p.replace("$DSL$", "javadsl"))  
+    ) map { p =>
+      p.replace("$DSL$", "scaladsl")
     },
     imports = Seq(
-      scalaJava8CompatImport(),
       akkaImport("akka.stream.*"),
       akkaImport("akka.parboiled2.*"))
   )
 
-  val httpTestkit = exports(Seq("akka.http.scaladsl.testkit.*", "akka.http.javadsl.testkit.*"))
+  val httpTestkit = exports(Seq("akka.http.scaladsl.testkit.*"))
 
   val httpSprayJson = exports(Seq("akka.http.scaladsl.marshallers.sprayjson"))
-
-  val httpXml = exports(Seq("akka.http.scaladsl.marshallers.xml"))
-
-  val httpJackson = exports(Seq("akka.http.javadsl.marshallers.jackson"))
 
   val stream =
     exports(
       packages = Seq("akka.stream.*",
                      "com.typesafe.sslconfig.akka.*"),
-      imports = Seq(scalaJava8CompatImport(), scalaParsingCombinatorImport())) ++
+      imports = Seq(scalaParsingCombinatorImport())) ++
       Seq(OsgiKeys.requireBundle := Seq(s"""com.typesafe.sslconfig;bundle-version="${Dependencies.sslConfigVersion}""""))
 
   val streamTestkit = exports(Seq("akka.stream.testkit.*"))
@@ -110,8 +105,7 @@ object OSGi {
     OsgiKeys.importPackage := imports ++ scalaVersion(defaultImports).value,
     OsgiKeys.exportPackage := packages
   )
-  def defaultImports(scalaVersion: String) = Seq("!sun.misc", akkaImport(), configImport(), "!scala.compat.java8.*",
-    "!scala.util.parsing.*", scalaImport(scalaVersion), "*")
+  def defaultImports(scalaVersion: String) = Seq("!sun.misc", akkaImport(), configImport(), "!scala.util.parsing.*", scalaImport(scalaVersion), "*")
   def akkaImport(packageName: String = "akka.*") = versionedImport(packageName, "2.4", "2.5")
   def configImport(packageName: String = "com.typesafe.config.*") = versionedImport(packageName, "1.3.0", "1.4.0")
   def scalaImport(version: String) = {
@@ -120,7 +114,6 @@ object OSGi {
     val ScalaVersion(epoch, major) = version
     versionedImport(packageName, s"$epoch.$major", s"$epoch.${major.toInt+1}")
   }
-  def scalaJava8CompatImport(packageName: String = "scala.compat.java8.*") = versionedImport(packageName, "0.7.0", "1.0.0")
   def scalaParsingCombinatorImport(packageName: String = "scala.util.parsing.combinator.*") = versionedImport(packageName, "1.0.4", "1.1.0")
   def kamonImport(packageName: String = "kamon.sigar.*") = optionalResolution(versionedImport(packageName, "1.6.5", "1.6.6"))
   def sigarImport(packageName: String = "org.hyperic.*") = optionalResolution(versionedImport(packageName, "1.6.5", "1.6.6"))

@@ -93,7 +93,7 @@ private[remote] object EnvelopeBuffer {
   val UsAscii = Charset.forName("US-ASCII")
 
   // accessing the internal char array of String when writing literal strings to ByteBuffer
-  val StringValueFieldOffset = Unsafe.instance.objectFieldOffset(classOf[String].getDeclaredField("value"))
+  //  val StringValueFieldOffset = Unsafe.instance.objectFieldOffset(classOf[String].getDeclaredField("value"))
 }
 
 /** INTERNAL API */
@@ -501,7 +501,7 @@ private[remote] final class EnvelopeBuffer(val byteBuffer: ByteBuffer) {
       byteBuffer.putShort(length.toShort)
       ensureLiteralCharsLength(length)
       val bytes = literalBytes
-      val chars = Unsafe.instance.getObject(literal, StringValueFieldOffset).asInstanceOf[Array[Char]]
+      val chars = literal.toCharArray
       var i = 0
       while (i < length) {
         // UsAscii

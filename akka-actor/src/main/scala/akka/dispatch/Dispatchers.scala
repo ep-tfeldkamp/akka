@@ -4,13 +4,15 @@
 
 package akka.dispatch
 
-import java.util.concurrent.{ ConcurrentHashMap, ThreadFactory }
-import com.typesafe.config.{ ConfigFactory, Config }
-import akka.actor.{ Scheduler, DynamicAccess, ActorSystem }
+import java.util.concurrent.{ ConcurrentHashMap, ThreadFactory, TimeUnit }
+
+import com.typesafe.config.{ Config, ConfigFactory }
+import akka.actor.{ ActorSystem, DynamicAccess, Scheduler }
 import akka.event.Logging.Warning
 import akka.event.EventStream
 import akka.ConfigurationException
 import akka.util.Helpers.ConfigOps
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -207,7 +209,8 @@ class DispatcherConfigurator(config: Config, prerequisites: DispatcherPrerequisi
     config.getInt("throughput"),
     config.getNanosDuration("throughput-deadline-time"),
     configureExecutor(),
-    config.getMillisDuration("shutdown-timeout"))
+    config.getMillisDuration("shutdown-timeout")
+  )
 
   /**
    * Returns the same dispatcher instance for each invocation

@@ -14,8 +14,6 @@ import akka.stream.Attributes.InputBuffer
 import akka.stream._
 import akka.stream.impl.Stages.DefaultAttributes
 import akka.stream.impl.StreamLayout.AtomicModule
-import java.util.concurrent.atomic.AtomicReference
-import java.util.function.BiConsumer
 import akka.actor.{ ActorRef, Props }
 import akka.stream.Attributes.InputBuffer
 import akka.stream._
@@ -29,10 +27,6 @@ import scala.language.postfixOps
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
 import akka.stream.scaladsl.{ Source, Sink, SinkQueueWithCancel, SinkQueue }
-import java.util.concurrent.CompletionStage
-import scala.compat.java8.FutureConverters._
-import scala.compat.java8.OptionConverters._
-import java.util.Optional
 import akka.event.Logging
 
 /**
@@ -397,48 +391,6 @@ final class QueueSink[T]() extends GraphStageWithMaterializedValue[SinkShape[T],
       }
     })
   }
-}
-
-final class SinkQueueAdapter[T](delegate: SinkQueueWithCancel[T]) extends akka.stream.javadsl.SinkQueueWithCancel[T] {
-  import akka.dispatch.ExecutionContexts.{ sameThreadExecutionContext ⇒ same }
-  def pull(): CompletionStage[Optional[T]] = delegate.pull().map(_.asJava)(same).toJava
-  def cancel(): Unit = delegate.cancel()
-
-}
-
-/**
- * INTERNAL API
- *
- * Helper class to be able to express collection as a fold using mutable data
- */
-private[akka] final class CollectorState[T, R](val collector: java.util.stream.Collector[T, Any, R]) {
-  lazy val accumulated = collector.supplier().get()
-  private lazy val accumulator = collector.accumulator()
-
-  def update(elem: T): CollectorState[T, R] = {
-    accumulator.accept(accumulated, elem)
-    this
-  }
-
-  def finish(): R = collector.finisher().apply(accumulated)
-}
-
-/**
- * INTERNAL API
- *
- * Helper class to be able to express reduce as a fold for parallel collector
- */
-private[akka] final class ReducerState[T, R](val collector: java.util.stream.Collector[T, Any, R]) {
-  private var reduced: Any = null.asInstanceOf[Any]
-  private lazy val combiner = collector.combiner()
-
-  def update(batch: Any): ReducerState[T, R] = {
-    if (reduced == null) reduced = batch
-    else reduced = combiner(reduced, batch)
-    this
-  }
-
-  def finish(): R = collector.finisher().apply(reduced)
 }
 
 /**

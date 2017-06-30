@@ -95,8 +95,9 @@ abstract class MessageDispatcher(val configurator: MessageDispatcherConfigurator
   @volatile private[this] var _shutdownScheduleDoNotCallMeDirectly: Int = _ // DO NOT TOUCH!
 
   private final def addInhabitants(add: Long): Long = {
-    val old = Unsafe.instance.getAndAddLong(this, inhabitantsOffset, add)
+    val old = Unsafe.getAndAddLong(Unsafe.instance, this, inhabitantsOffset, add)
     val ret = old + add
+
     if (ret < 0) {
       // We haven't succeeded in decreasing the inhabitants yet but the simple fact that we're trying to
       // go below zero means that there is an imbalance and we might as well throw the exception
