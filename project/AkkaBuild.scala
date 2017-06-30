@@ -9,8 +9,6 @@ import java.io.InputStreamReader
 import java.util.Properties
 
 import akka.TestExtras.JUnitFileReporting
-import com.typesafe.sbt.S3Plugin.S3
-import com.typesafe.sbt.S3Plugin.s3Settings
 import com.typesafe.sbt.pgp.PgpKeys.publishSigned
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 import com.typesafe.tools.mima.plugin.MimaPlugin
@@ -34,21 +32,14 @@ object AkkaBuild extends Build {
 
   lazy val buildSettings = Dependencies.Versions ++ Seq(
     organization        := "com.typesafe.akka",
-    version             := "2.4.19"
+    version             := "2.4.19-dg-1.0.0-SNAPSHOT"
   )
 
   lazy val rootSettings = parentSettings ++ Release.settings ++
-    SphinxDoc.akkaSettings ++ Dist.settings ++ s3Settings ++
+    SphinxDoc.akkaSettings ++ Dist.settings ++
     UnidocRoot.akkaSettings ++
     Protobuf.settings ++ Seq(
-      parallelExecution in GlobalScope := System.getProperty("akka.parallelExecution", parallelExecutionByDefault.toString).toBoolean,
-      S3.host in S3.upload := "downloads.typesafe.com.s3.amazonaws.com",
-      S3.progress in S3.upload := true,
-      mappings in S3.upload <<= (Release.releaseDirectory, version) map { (d, v) =>
-        val downloads = d / "downloads"
-        val archivesPathFinder = downloads * s"*$v.zip"
-        archivesPathFinder.get.map(file => file -> ("akka/" + file.getName))
-      }
+      parallelExecution in GlobalScope := System.getProperty("akka.parallelExecution", parallelExecutionByDefault.toString).toBoolean
     )
 
   lazy val aggregatedProjects: Seq[ProjectReference] = Seq(

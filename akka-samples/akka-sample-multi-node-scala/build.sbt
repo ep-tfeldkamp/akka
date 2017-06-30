@@ -1,7 +1,7 @@
 import com.typesafe.sbt.SbtMultiJvm
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
-val akkaVersion = "2.4.19"
+val akkaVersion = "2.4.19-dg-1.0.0-SNAPSHOT"
 
 val project = Project(
     id = "akka-sample-multi-node-scala",
@@ -10,7 +10,7 @@ val project = Project(
   .settings(SbtMultiJvm.multiJvmSettings: _*)
   .settings(
     name := "akka-sample-multi-node-scala",
-    version := "2.4.19",
+    version := "2.4.19-dg-1.0.0-SNAPSHOT",
     scalaVersion := "2.11.8",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,

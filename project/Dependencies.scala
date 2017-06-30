@@ -14,8 +14,8 @@ object Dependencies {
   lazy val scalaCheckVersion = settingKey[String]("The version of ScalaCheck to use.")
   lazy val java8CompatVersion = settingKey[String]("The version of scala-java8-compat to use.")
   val junitVersion = "4.12"
-  val sslConfigVersion = "0.2.1"
-  val aeronVersion = "1.2.5"
+  val sslConfigVersion = "0.1.3"
+  val aeronVersion = "1.2.5-dg-1.0.0-SNAPSHOT"
 
   val Versions = Seq(
     crossScalaVersions := Seq("2.11.11", "2.12.2"),
@@ -44,7 +44,7 @@ object Dependencies {
     val camelCore     = "org.apache.camel"            % "camel-core"                   % "2.13.4" exclude("org.slf4j", "slf4j-api") // ApacheV2
 
     // when updating config version, update links ActorSystem ScalaDoc to link to the updated version
-    val config        = "com.typesafe"                % "config"                       % "1.3.0"       // ApacheV2
+    val config        = "com.typesafe"                % "config"                       % "1.2.1"       // ApacheV2
     val netty         = "io.netty"                    % "netty"                        % "3.10.6.Final" // ApacheV2
     val scalaStm      = Def.setting { "org.scala-stm" %% "scala-stm" % scalaStmVersion.value } // Modified BSD (Scala)
 
@@ -131,7 +131,14 @@ object Dependencies {
   // TODO check if `l ++=` everywhere expensive?
   val l = libraryDependencies
 
-  val actor = l ++= Seq(config, java8Compat.value)
+  val actor: Def.SettingsDefinition = {
+    l ++= Seq(config) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 12 =>
+        Seq("org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0")
+      case _ =>
+        Seq.empty
+    })
+  }
 
   val testkit = l ++= Seq(Test.junit, Test.scalatest.value) ++ Test.metricsAll
 
