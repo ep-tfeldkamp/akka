@@ -4,9 +4,9 @@ version := "2.4.19-dg-1.0.0-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
-javacOptions in compile ++= Seq("-encoding", "UTF-8", "-source", "1.8", "-target", "1.8", "-Xlint")
+javacOptions in compile ++= Seq("-encoding", "UTF-8", "-source", "1.7", "-target", "1.7", "-Xlint")
 
-javacOptions in doc ++= Seq("-encoding", "UTF-8", "-source", "1.8", "-Xdoclint:none")
+javacOptions in doc ++= Seq("-encoding", "UTF-8", "-source", "1.7", "-Xdoclint:none")
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
 

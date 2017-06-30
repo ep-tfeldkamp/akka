@@ -5,7 +5,7 @@
 package akka.remote.artery.compress
 
 import java.util.concurrent.atomic.AtomicReference
-import java.util.function.{ Consumer, LongFunction }
+import com.dasgip.java8.function.{ Consumer, LongFunction }
 
 import akka.actor.{ ActorRef, ActorSystem, Address }
 import akka.event.{ Logging, LoggingAdapter }

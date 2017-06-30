@@ -16,13 +16,21 @@ public class LineNumberSpecCodeForJava {
   }
 
   public F f1() {
-    return (s) -> s;
+    return new F() {
+      @Override
+      public String doit(String arg) {
+        return arg;
+      }
+    };
   }
 
   public F f2() {
-    return (s) -> {
-      System.out.println(s);
-      return s;
+    return new F() {
+      @Override
+      public String doit(String s) {
+        System.out.println(s);
+        return s;
+      }
     };
   }
 

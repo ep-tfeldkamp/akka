@@ -15,8 +15,18 @@ public class PFBuilderTest extends JUnitSuite {
   @Test
   public void pfbuilder_matchAny_should_infer_declared_input_type_for_lambda() {
     PartialFunction<String,Integer> pf = new PFBuilder<String,Integer>()
-      .matchEquals("hello", s -> 1)
-      .matchAny(s -> Integer.valueOf(s))
+      .matchEquals("hello", new FI.Apply<String, Integer>() {
+        @Override
+        public Integer apply(String s) throws Exception {
+          return 1;
+        }
+      })
+      .matchAny(new FI.Apply<String, Integer>() {
+        @Override
+        public Integer apply(String s) throws Exception {
+          return Integer.valueOf(s);
+        }
+      })
       .build();
       
     assertTrue(pf.isDefinedAt("hello"));

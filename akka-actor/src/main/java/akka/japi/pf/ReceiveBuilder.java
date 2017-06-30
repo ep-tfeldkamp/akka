@@ -43,7 +43,7 @@ public class ReceiveBuilder {
    * @return a builder with no case statements
    */
   public static UnitPFBuilder<Object> create() {
-    return new UnitPFBuilder<>();
+    return new UnitPFBuilder<Object>();
   }
 
   /**

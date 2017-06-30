@@ -22,7 +22,7 @@ import scala.runtime.BoxedUnit;
 public class FSMStopBuilder<S, D> {
 
   private UnitPFBuilder<PersistentFSM.StopEvent<S, D>> builder =
-    new UnitPFBuilder<>();
+    new UnitPFBuilder<PersistentFSM.StopEvent<S, D>>();
 
   /**
    * Add a case statement that matches on an {@link akka.actor.FSM.Reason}.

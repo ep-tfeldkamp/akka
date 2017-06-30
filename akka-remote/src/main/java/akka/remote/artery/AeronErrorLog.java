@@ -19,6 +19,7 @@ import io.aeron.CncFileDescriptor;
 import org.agrona.DirectBuffer;
 import org.agrona.IoUtil;
 import org.agrona.concurrent.AtomicBuffer;
+import org.agrona.concurrent.errors.ErrorConsumer;
 import org.agrona.concurrent.errors.ErrorLogReader;
 
 import akka.event.LoggingAdapter;
@@ -60,22 +61,27 @@ public class AeronErrorLog
       }
     }
 
-    public long logErrors(LoggingAdapter log, long sinceTimestamp)
+    public long logErrors(final LoggingAdapter log, long sinceTimestamp)
     {
         // using AtomicLong because access from lambda, not because of currency
         final AtomicLong lastTimestamp = new AtomicLong(sinceTimestamp);
 
         ErrorLogReader.read(
-            buffer,
-            (observationCount, firstObservationTimestamp, lastObservationTimestamp, encodedException) -> {
-                  log.error(String.format(
-                      "Aeron error: %d observations from %s to %s for:%n %s",
-                      observationCount,
-                      dateFormat.format(new Date(firstObservationTimestamp)),
-                      dateFormat.format(new Date(lastObservationTimestamp)),
-                      encodedException));
-                  lastTimestamp.set(Math.max(lastTimestamp.get(), lastObservationTimestamp));
-                }, sinceTimestamp);
+                buffer,
+                new ErrorConsumer() {
+                    @Override
+                    public void accept(int observationCount, long firstObservationTimestamp, long lastObservationTimestamp, String encodedException) {
+                        log.error(String.format(
+                                "Aeron error: %d observations from %s to %s for:%n %s",
+                                observationCount,
+                                dateFormat.format(new Date(firstObservationTimestamp)),
+                                dateFormat.format(new Date(lastObservationTimestamp)),
+                                encodedException));
+                        lastTimestamp.set(Math.max(lastTimestamp.get(), lastObservationTimestamp));
+                    }
+                },
+                sinceTimestamp
+        );
         return lastTimestamp.get();
     }
 

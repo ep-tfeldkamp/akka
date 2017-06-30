@@ -1,0 +1,10 @@
+[repositories]
+  local
+  maven-local
+  ivy-artifactory-libs-release: http://artifactory.zentrale.local/libs-release, [organisation]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
+  ivy-artifactory-plugins-releases: http://artifactory.zentrale.local/plugins-release/, [organisation]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
+  ivy-artifactory-binaries-releases: http://artifactory.zentrale.local/bin-release/, [organisation]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
+  mvn-artifactory-libs-release: http://artifactory.zentrale.local/libs-release
+  mvn-artifactory-plugins-releases: http://artifactory.zentrale.local/plugins-release/
+  mvn-artifactory-binaries-releases: http://artifactory.zentrale.local/bin-release/
+

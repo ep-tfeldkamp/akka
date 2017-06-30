@@ -14,7 +14,7 @@ object Dependencies {
   lazy val scalaCheckVersion = settingKey[String]("The version of ScalaCheck to use.")
   val junitVersion = "4.12"
   val sslConfigVersion = "0.1.3"
-  val aeronVersion = "1.2.5-dg-1.0.0-SNAPSHOT"
+  val aeronVersion = "1.2.5-dg-1.0.0"
 
   val Versions = Seq(
     crossScalaVersions := Seq("2.11.11", "2.12.2"),
@@ -66,8 +66,9 @@ object Dependencies {
     val junit       = "junit"                         % "junit"                        % junitVersion  // Common Public License 1.0
 
     // For Java 8 Conversions
-    val aeronDriver = "io.aeron"                      % "aeron-driver"                 % aeronVersion       // ApacheV2
-    val aeronClient = "io.aeron"                      % "aeron-client"                 % aeronVersion       // ApacheV2
+    val dasgipJava8Compat = "com.dasgip"                    % "java8-compat"                 % "0.1.0"       % "compile"
+    val aeronDriver       = "io.aeron"                      % "aeron-driver"                 % aeronVersion  // ApacheV2
+    val aeronClient       = "io.aeron"                      % "aeron-client"                 % aeronVersion  // ApacheV2
 
     object Docs {
       val sprayJson   = "io.spray"                   %%  "spray-json"                  % "1.3.2"             % "test"
@@ -135,7 +136,7 @@ object Dependencies {
 
   val actorTests = l ++= Seq(Test.junit, Test.scalatest.value, Test.commonsCodec, Test.commonsMath, Test.mockito, Test.scalacheck.value, Test.junitIntf)
 
-  val remote = l ++= Seq(netty, uncommonsMath, aeronDriver, aeronClient, Test.junit, Test.scalatest.value, Test.jimfs)
+  val remote = l ++= Seq(netty, uncommonsMath, dasgipJava8Compat, aeronDriver, aeronClient, Test.junit, Test.scalatest.value, Test.jimfs)
 
   val remoteTests = l ++= Seq(Test.junit, Test.scalatest.value, Test.scalaXml)
 
