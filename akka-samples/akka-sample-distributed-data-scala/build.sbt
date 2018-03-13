@@ -1,8 +1,6 @@
 import com.typesafe.sbt.SbtMultiJvm
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
-val akkaVersion = "2.4.19-dg-1.0.0-SNAPSHOT"
-
 val project = Project(
     id = "akka-sample-distributed-data-scala",
     base = file(".")
@@ -10,17 +8,21 @@ val project = Project(
   .settings(SbtMultiJvm.multiJvmSettings: _*)
   .settings(
     name := "akka-sample-distributed-data-scala",
-    version := "2.4.19-dg-1.0.0-SNAPSHOT",
+    isSnapshot := false,
+    version := "2.4.19-dg-1.1.0" + (if (isSnapshot.value) "-SNAPSHOT" else ""),
     scalaVersion := "2.11.8",
     scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.7", "-deprecation", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint"),
     javacOptions in Compile ++= Seq("-source", "1.7", "-target", "1.7", "-Xlint:unchecked", "-Xlint:deprecation"),
-    libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-      "com.typesafe.akka" %% "akka-remote" % akkaVersion,
-      "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
-      "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion,
-      "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion,
-      "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
+    libraryDependencies ++= {
+      val akkaVersion = "2.4.19-dg-1.1.0" + (if (isSnapshot.value) "-SNAPSHOT" else "")
+      Seq(
+        "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+        "com.typesafe.akka" %% "akka-remote" % akkaVersion,
+        "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
+        "com.typesafe.akka" %% "akka-distributed-data-experimental" % akkaVersion,
+        "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion,
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test")
+    },
     javaOptions in run ++= Seq(
       "-Xms128m", "-Xmx1024m"),
     Keys.fork in run := true,

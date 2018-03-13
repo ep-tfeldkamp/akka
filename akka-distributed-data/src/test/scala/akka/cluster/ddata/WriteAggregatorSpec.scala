@@ -63,9 +63,7 @@ class WriteAggregatorSpec extends AkkaSpec(s"""
       """)
   with ImplicitSender {
 
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
 
   val nodeA = Address(protocol, "Sys", "a", 2552)
   val nodeB = nodeA.copy(host = Some("b"))

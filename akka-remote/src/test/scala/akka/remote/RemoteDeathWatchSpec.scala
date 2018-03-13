@@ -28,9 +28,7 @@ akka {
 }
 """)) with ImplicitSender with DefaultTimeout with DeathWatchSpec {
 
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
 
   val other = ActorSystem("other", ConfigFactory.parseString("akka.remote.netty.tcp.port=2666")
     .withFallback(system.settings.config))

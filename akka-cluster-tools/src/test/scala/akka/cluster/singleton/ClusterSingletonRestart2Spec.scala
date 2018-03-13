@@ -97,9 +97,7 @@ class ClusterSingletonRestart2Spec extends AkkaSpec("""
         val sys2port = Cluster(sys2).selfAddress.port.get
 
         val sys4Config =
-          ConfigFactory.parseString(
-            if (RARP(sys1).provider.remoteSettings.Artery.Enabled) s"akka.remote.artery.canonical.port=$sys2port"
-            else s"akka.remote.netty.tcp.port=$sys2port").withFallback(system.settings.config)
+          ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$sys2port").withFallback(system.settings.config)
 
         ActorSystem(system.name, sys4Config)
       }

@@ -69,16 +69,10 @@ abstract class QuickRestartSpec
                 system.name,
                 // use the same port
                 ConfigFactory.parseString(
-                  if (RARP(system).provider.remoteSettings.Artery.Enabled)
-                    s"""
-                       akka.cluster.roles = [round-$n]
-                       akka.remote.artery.canonical.port = ${Cluster(restartingSystem).selfAddress.port.get}
-                     """
-                  else
-                    s"""
-                      akka.cluster.roles = [round-$n]
-                      akka.remote.netty.tcp.port = ${Cluster(restartingSystem).selfAddress.port.get}
-                    """
+                  s"""
+                    akka.cluster.roles = [round-$n]
+                    akka.remote.netty.tcp.port = ${Cluster(restartingSystem).selfAddress.port.get}
+                  """
                 ).withFallback(system.settings.config))
           log.info("Restarting node has address: {}", Cluster(restartingSystem).selfUniqueAddress)
           Cluster(restartingSystem).joinSeedNodes(seedNodes)

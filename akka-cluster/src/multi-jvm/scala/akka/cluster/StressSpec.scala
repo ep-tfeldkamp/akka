@@ -748,8 +748,6 @@ abstract class StressSpec
     }
   })
 
-  def isArteryEnabled: Boolean = RARP(system).provider.remoteSettings.Artery.Enabled
-
   def jvmInfo(): String = {
     val runtime = ManagementFactory.getRuntimeMXBean
     val os = ManagementFactory.getOperatingSystemMXBean
@@ -1162,10 +1160,6 @@ abstract class StressSpec
       }
       enterBarrier("after-" + step)
     }
-
-    // FIXME issue #21810
-    // note: there must be one test step before pending, otherwise afterTermination will not run
-    if (isArteryEnabled) pending
 
     "join seed nodes" taggedAs LongRunningTest in within(30 seconds) {
 

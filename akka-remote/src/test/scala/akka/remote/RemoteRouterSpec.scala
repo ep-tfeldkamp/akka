@@ -45,9 +45,7 @@ class RemoteRouterSpec extends AkkaSpec("""
 
   val port = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress.port.get
   val sysName = system.name
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
   val conf = ConfigFactory.parseString(
     s"""
     akka {

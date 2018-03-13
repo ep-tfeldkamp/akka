@@ -163,14 +163,7 @@ abstract class UnreachableNodeJoinsAgainSpec
         val victimAddress = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val freshConfig =
           ConfigFactory.parseString(
-            if (RARP(system).provider.remoteSettings.Artery.Enabled)
-              s"""
-                akka.remote.artery.canonical {
-                  hostname = ${victimAddress.host.get}
-                  port = ${victimAddress.port.get}
-                }
-               """
-            else s"""
+            s"""
               akka.remote.netty.tcp {
                 hostname = ${victimAddress.host.get}
                 port = ${victimAddress.port.get}

@@ -105,8 +105,6 @@ abstract class NodeChurnSpec
     }
   }
 
-  def isArteryEnabled: Boolean = RARP(system).provider.remoteSettings.Artery.Enabled
-
   "Cluster with short lived members" must {
 
     "setup stable nodes" taggedAs LongRunningTest in within(15.seconds) {
@@ -116,10 +114,6 @@ abstract class NodeChurnSpec
       awaitMembersUp(roles.size)
       enterBarrier("stable")
     }
-
-    // FIXME issue #21483
-    // note: there must be one test step before pending, otherwise afterTermination will not run
-    if (isArteryEnabled) pending
 
     "join and remove transient nodes without growing gossip payload" taggedAs LongRunningTest in {
       // This test is configured with log-frame-size-exceeding and the LogListener

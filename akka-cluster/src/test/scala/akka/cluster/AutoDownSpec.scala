@@ -41,9 +41,7 @@ object AutoDownSpec {
 class AutoDownSpec extends AkkaSpec("akka.actor.provider=remote") {
   import AutoDownSpec._
 
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
 
   val memberA = TestMember(Address(protocol, "sys", "a", 2552), Up)
   val memberB = TestMember(Address(protocol, "sys", "b", 2552), Up)

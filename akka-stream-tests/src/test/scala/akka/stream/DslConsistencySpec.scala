@@ -16,21 +16,15 @@ object DslConsistencySpec {
 class DslConsistencySpec extends WordSpec with Matchers {
 
   val sFlowClass: Class[_] = classOf[akka.stream.scaladsl.Flow[_, _, _]]
-  val jFlowClass: Class[_] = classOf[akka.stream.javadsl.Flow[_, _, _]]
 
   val sSubFlowClass: Class[_] = classOf[DslConsistencySpec.ScalaSubFlow[_, _, _]]
-  val jSubFlowClass: Class[_] = classOf[akka.stream.javadsl.SubFlow[_, _, _]]
 
   val sSourceClass: Class[_] = classOf[akka.stream.scaladsl.Source[_, _]]
-  val jSourceClass: Class[_] = classOf[akka.stream.javadsl.Source[_, _]]
 
   val sSubSourceClass: Class[_] = classOf[DslConsistencySpec.ScalaSubSource[_, _]]
-  val jSubSourceClass: Class[_] = classOf[akka.stream.javadsl.SubSource[_, _]]
 
   val sSinkClass: Class[_] = classOf[akka.stream.scaladsl.Sink[_, _]]
-  val jSinkClass: Class[_] = classOf[akka.stream.javadsl.Sink[_, _]]
 
-  val jRunnableGraphClass: Class[_] = classOf[akka.stream.javadsl.RunnableGraph[_]]
   val sRunnableGraphClass: Class[_] = classOf[akka.stream.scaladsl.RunnableGraph[_]]
 
   val ignore =
@@ -41,11 +35,6 @@ class DslConsistencySpec extends WordSpec with Matchers {
 
   val graphHelpers = Set("zipGraph", "zipWithGraph", "mergeGraph", "mergeSortedGraph", "interleaveGraph", "concatGraph", "prependGraph", "alsoToGraph", "orElseGraph")
   val allowMissing: Map[Class[_], Set[String]] = Map(
-    jFlowClass → graphHelpers,
-    jSourceClass → graphHelpers,
-    // Java subflows can only be nested using .via and .to (due to type system restrictions)
-    jSubFlowClass → (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
-    jSubSourceClass → (graphHelpers ++ Set("groupBy", "splitAfter", "splitWhen", "subFlow")),
     sFlowClass → Set("of"),
     sSourceClass → Set("adapt", "from"),
     sSinkClass → Set("adapt"),
@@ -57,50 +46,6 @@ class DslConsistencySpec extends WordSpec with Matchers {
     // include class name to get better error message
     if (!allowMissing.getOrElse(c, Set.empty).contains(name))
       c.getMethods.collect { case m if !ignore(m.getName) ⇒ c.getName + "." + m.getName } should contain(c.getName + "." + name)
-  }
-
-  "Java and Scala DSLs" must {
-
-    ("Source" → List[Class[_]](sSourceClass, jSourceClass)) ::
-      ("SubSource" → List[Class[_]](sSubSourceClass, jSubSourceClass)) ::
-      ("Flow" → List[Class[_]](sFlowClass, jFlowClass)) ::
-      ("SubFlow" → List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
-      ("Sink" → List[Class[_]](sSinkClass, jSinkClass)) ::
-      ("RunnableFlow" → List[Class[_]](sRunnableGraphClass, jRunnableGraphClass)) ::
-      Nil foreach {
-        case (element, classes) ⇒
-
-          s"provide same $element transforming operators" in {
-            val allOps =
-              (for {
-                c ← classes
-                m ← c.getMethods
-                if !Modifier.isStatic(m.getModifiers)
-                if !ignore(m.getName)
-                if !m.getName.contains("$")
-                if !materializing(m)
-              } yield m.getName).toSet
-
-            for (c ← classes; op ← allOps)
-              assertHasMethod(c, op)
-          }
-
-          s"provide same $element materializing operators" in {
-            val materializingOps =
-              (for {
-                c ← classes
-                m ← c.getMethods
-                if !Modifier.isStatic(m.getModifiers)
-                if !ignore(m.getName)
-                if !m.getName.contains("$")
-                if materializing(m)
-              } yield m.getName).toSet
-
-            for (c ← classes; op ← materializingOps)
-              assertHasMethod(c, op)
-          }
-
-      }
   }
 
 }

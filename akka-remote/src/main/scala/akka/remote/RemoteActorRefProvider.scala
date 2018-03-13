@@ -17,10 +17,7 @@ import scala.util.control.Exception.Catcher
 import scala.concurrent.Future
 import akka.ConfigurationException
 import akka.dispatch.{ RequiresMessageQueue, UnboundedMessageQueueSemantics }
-import akka.remote.artery.ArteryTransport
 import akka.util.OptionVal
-import akka.remote.artery.OutboundEnvelope
-import akka.remote.artery.SystemMessageDelivery.SystemMessageEnvelope
 import akka.remote.serialization.ActorRefResolveCache
 import akka.remote.serialization.ActorRefResolveThreadLocalCache
 
@@ -100,18 +97,11 @@ private[akka] object RemoteActorRefProvider {
         // else ignore: it is a reliably delivered message that might be retried later, and it has not yet deserved
         // the dead letter status
         if (seqOpt.isEmpty) super.!(DeadLetter(m, senderOption.getOrElse(_provider.deadLetters), recipient))
-      case env: OutboundEnvelope ⇒
-        super.!(DeadLetter(unwrapSystemMessageEnvelope(env.message), env.sender.getOrElse(_provider.deadLetters),
-          env.recipient.getOrElse(_provider.deadLetters)))
-      case DeadLetter(env: OutboundEnvelope, _, _) ⇒
-        super.!(DeadLetter(unwrapSystemMessageEnvelope(env.message), env.sender.getOrElse(_provider.deadLetters),
-          env.recipient.getOrElse(_provider.deadLetters)))
       case _ ⇒ super.!(message)(sender)
     }
 
     private def unwrapSystemMessageEnvelope(msg: AnyRef): AnyRef = msg match {
-      case SystemMessageEnvelope(m, _, _) ⇒ m
-      case _                              ⇒ msg
+      case _ ⇒ msg
     }
 
     @throws(classOf[java.io.ObjectStreamException])
@@ -201,8 +191,8 @@ private[akka] class RemoteActorRefProvider(
       d
     },
       serialization = SerializationExtension(system),
-      transport = if (remoteSettings.Artery.Enabled) new ArteryTransport(system, this) else new Remoting(system, this))
-
+      transport = new Remoting(system, this)
+    )
     _internals = internals
     remotingTerminator ! internals
 
@@ -496,16 +486,6 @@ private[akka] class RemoteActorRef private[akka] (
   props:                 Option[Props],
   deploy:                Option[Deploy])
   extends InternalActorRef with RemoteRef {
-
-  remote match {
-    case t: ArteryTransport ⇒
-      // detect mistakes such as using "akka.tcp" with Artery
-      if (path.address.protocol != t.localAddress.address.protocol)
-        throw new IllegalArgumentException(
-          s"Wrong protocol of [${path}], expected [${t.localAddress.address.protocol}]")
-    case _ ⇒
-  }
-  @volatile private[remote] var cachedAssociation: artery.Association = null
 
   // used by artery to direct messages to separate specialized streams
   @volatile private[remote] var cachedSendQueueIndex: Int = -1

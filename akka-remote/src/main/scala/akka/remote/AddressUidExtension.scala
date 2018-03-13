@@ -29,21 +29,13 @@ object AddressUidExtension extends ExtensionId[AddressUidExtension] with Extensi
 
 class AddressUidExtension(val system: ExtendedActorSystem) extends Extension {
 
-  private def arteryEnabled = system.provider.asInstanceOf[RemoteActorRefProvider].remoteSettings.Artery.Enabled
-
   val longAddressUid: Long = {
-    val tlr = ThreadLocalRandom.current
-    if (arteryEnabled) tlr.nextLong()
-    // with the old remoting we need to make toInt.toLong return the same number
-    // to keep wire compatibility
-    else tlr.nextInt().toLong
+    ThreadLocalRandom.current.nextInt().toLong
   }
 
   // private because GenJavaDoc fails on deprecated annotated lazy val
   private lazy val _addressUid: Int = {
-    if (arteryEnabled) {
-      throw new IllegalStateException("Int UID must never be used with Artery")
-    } else longAddressUid.toInt
+    longAddressUid.toInt
   }
 
   // used by old remoting and part of public api

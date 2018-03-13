@@ -63,7 +63,11 @@ object Scaladoc extends AutoPlugin {
           }
           else false
         }
-        hasDiagram || findHTMLFileWithDiagram(rest)
+        if (hasDiagram) {
+          true
+        } else {
+          findHTMLFileWithDiagram(rest)
+        }
       }
     }
 
@@ -120,7 +124,7 @@ object UnidocRoot extends AutoPlugin {
 
   override lazy val projectSettings =
     CliOptions.genjavadocEnabled.ifTrue(scalaJavaUnidocSettings).getOrElse(scalaUnidocSettings) ++
-    settings(Seq(AkkaBuild.samples), Seq(AkkaBuild.remoteTests, AkkaBuild.benchJmh, AkkaBuild.protobuf, AkkaBuild.osgiDiningHakkersSampleMavenTest, AkkaBuild.akkaScalaNightly))
+    settings(Seq.empty, Seq(AkkaBuild.remoteTests, AkkaBuild.benchJmh, AkkaBuild.protobuf, AkkaBuild.akkaScalaNightly))
 }
 
 /**

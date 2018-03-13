@@ -1,1 +1,0 @@
--XX:+DisableExplicitGC -XX:MaxDirectMemorySize=16m -DDirectMemorySpec.marker=true

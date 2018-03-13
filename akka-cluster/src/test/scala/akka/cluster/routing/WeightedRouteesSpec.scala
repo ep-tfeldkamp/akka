@@ -17,9 +17,7 @@ class WeightedRouteesSpec extends AkkaSpec(ConfigFactory.parseString("""
       akka.remote.netty.tcp.port = 0
       """)) {
 
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
 
   val a1 = Address(protocol, "sys", "a1", 2551)
   val b1 = Address(protocol, "sys", "b1", 2551)

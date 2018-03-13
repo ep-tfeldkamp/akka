@@ -7,9 +7,6 @@ package akka.remote
 import akka.remote.WireFormats._
 import akka.protobuf.ByteString
 import akka.actor.ExtendedActorSystem
-import akka.remote.artery.{ EnvelopeBuffer, HeaderBuilder, OutboundEnvelope }
-import akka.serialization.Serialization
-import akka.serialization.ByteBufferSerializer
 import akka.serialization.SerializationExtension
 import akka.serialization.SerializerWithStringManifest
 import scala.util.control.NonFatal
@@ -61,33 +58,5 @@ private[akka] object MessageSerializer {
         throw new SerializationException(s"Failed to serialize remote message [${message.getClass}] " +
           s"using serializer [${serializer.getClass}].", e)
     }
-  }
-
-  def serializeForArtery(serialization: Serialization, outboundEnvelope: OutboundEnvelope, headerBuilder: HeaderBuilder, envelope: EnvelopeBuffer): Unit = {
-    val message = outboundEnvelope.message
-    val serializer = serialization.findSerializerFor(message)
-
-    headerBuilder setSerializer serializer.identifier
-
-    def manifest: String = serializer match {
-      case ser: SerializerWithStringManifest ⇒ ser.manifest(message)
-      case _                                 ⇒ if (serializer.includeManifest) message.getClass.getName else ""
-    }
-
-    serializer match {
-      case ser: ByteBufferSerializer ⇒
-        headerBuilder setManifest manifest
-        envelope.writeHeader(headerBuilder, outboundEnvelope)
-        ser.toBinary(message, envelope.byteBuffer)
-      case _ ⇒
-        headerBuilder setManifest manifest
-        envelope.writeHeader(headerBuilder, outboundEnvelope)
-        envelope.byteBuffer.put(serializer.toBinary(message))
-    }
-  }
-
-  def deserializeForArtery(system: ExtendedActorSystem, originUid: Long, serialization: Serialization,
-                           serializer: Int, classManifest: String, envelope: EnvelopeBuffer): AnyRef = {
-    serialization.deserializeByteBuffer(envelope.byteBuffer, serializer, classManifest)
   }
 }

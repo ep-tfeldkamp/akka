@@ -63,33 +63,6 @@ class FlowLogSpec extends StreamSpec("""
 
     }
 
-    "on javadsl.Flow" must {
-      "debug each element" in {
-        val log = Logging(system, "com.example.ImportantLogger")
-
-        val debugging: javadsl.Flow[Integer, Integer, NotUsed] = javadsl.Flow.of(classOf[Integer])
-          .log("log-1")
-          .log("log-2", new akka.japi.function.Function[Integer, Integer] { def apply(i: Integer) = i })
-          .log("log-3", new akka.japi.function.Function[Integer, Integer] { def apply(i: Integer) = i }, log)
-          .log("log-4", log)
-
-        javadsl.Source.single[Integer](1).via(debugging).runWith(javadsl.Sink.ignore(), mat)
-
-        var counter = 0
-        var finishCounter = 0
-        import scala.concurrent.duration._
-        logProbe.fishForMessage(3.seconds) {
-          case Logging.Debug(_, _, msg: String) if msg contains "Element: 1" ⇒
-            counter += 1
-            counter == 4 && finishCounter == 4
-
-          case Logging.Debug(_, _, msg: String) if msg contains "Upstream finished" ⇒
-            finishCounter += 1
-            counter == 4 && finishCounter == 4
-        }
-      }
-    }
-
     "on Source" must {
       "debug each element" in {
         Source(1 to 2).log("flow-s2").runWith(Sink.ignore)
@@ -154,30 +127,6 @@ class FlowLogSpec extends StreamSpec("""
         val future = Source(1 to 5).log("hi", n ⇒ throw ex)
           .withAttributes(supervisionStrategy(resumingDecider)).runWith(Sink.fold(0)(_ + _))
         Await.result(future, 500.millis) shouldEqual 0
-      }
-    }
-
-    "on javadsl.Source" must {
-      "debug each element" in {
-        val log = Logging(system, "com.example.ImportantLogger")
-
-        javadsl.Source.single[Integer](1)
-          .log("log-1")
-          .log("log-2", new akka.japi.function.Function[Integer, Integer] { def apply(i: Integer) = i })
-          .log("log-3", new akka.japi.function.Function[Integer, Integer] { def apply(i: Integer) = i }, log)
-          .log("log-4", log)
-          .runWith(javadsl.Sink.ignore(), mat)
-
-        var counter = 1
-        import scala.concurrent.duration._
-        logProbe.fishForMessage(3.seconds) {
-          case Logging.Debug(_, _, msg: String) if msg contains "Element: 1" ⇒
-            counter += 1
-            counter == 4
-
-          case Logging.Debug(_, _, msg: String) if msg contains "Upstream finished" ⇒
-            false
-        }
       }
     }
 

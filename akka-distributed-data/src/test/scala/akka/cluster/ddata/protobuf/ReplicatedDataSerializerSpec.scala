@@ -36,7 +36,7 @@ class ReplicatedDataSerializerSpec extends TestKit(ActorSystem(
 
   val serializer = new ReplicatedDataSerializer(system.asInstanceOf[ExtendedActorSystem])
 
-  val Protocol = if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka" else "akka.tcp"
+  val Protocol = "akka.tcp"
 
   val address1 = UniqueAddress(Address(Protocol, system.name, "some.host.org", 4711), 1L)
   val address2 = UniqueAddress(Address(Protocol, system.name, "other.host.org", 4711), 2L)

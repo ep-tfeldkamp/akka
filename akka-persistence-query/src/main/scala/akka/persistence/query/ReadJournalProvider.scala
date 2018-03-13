@@ -22,10 +22,4 @@ trait ReadJournalProvider {
    * This corresponds to the instance that is returned by [[PersistenceQuery#readJournalFor]].
    */
   def scaladslReadJournal(): scaladsl.ReadJournal
-
-  /**
-   * The `ReadJournal` implementation for the Java API.
-   * This corresponds to the instance that is returned by [[PersistenceQuery#getReadJournalFor]].
-   */
-  def javadslReadJournal(): javadsl.ReadJournal
 }

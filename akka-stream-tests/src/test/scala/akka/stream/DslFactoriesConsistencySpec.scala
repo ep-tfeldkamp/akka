@@ -37,24 +37,16 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
       (classOf[scala.Function0[_]],                     classOf[java.util.concurrent.Callable[_]]) ::
       (classOf[scala.Function1[_, Unit]],               classOf[akka.japi.function.Procedure[_]]) ::
       (classOf[scala.Function1[_, _]],                  classOf[akka.japi.function.Function[_, _]]) ::
-      (classOf[akka.stream.scaladsl.Source[_, _]],      classOf[akka.stream.javadsl.Source[_, _]]) ::
-      (classOf[akka.stream.scaladsl.Sink[_, _]],        classOf[akka.stream.javadsl.Sink[_, _]]) ::
-      (classOf[akka.stream.scaladsl.Flow[_, _, _]],     classOf[akka.stream.javadsl.Flow[_, _, _]]) ::
-      (classOf[akka.stream.scaladsl.RunnableGraph[_]],  classOf[akka.stream.javadsl.RunnableGraph[_]]) ::
       ((2 to 22) map { i => (Class.forName(s"scala.Function$i"), Class.forName(s"akka.japi.function.Function$i")) }).toList
   // format: ON
 
   val sSource = classOf[scaladsl.Source[_, _]]
-  val jSource = classOf[javadsl.Source[_, _]]
 
   val sSink = classOf[scaladsl.Sink[_, _]]
-  val jSink = classOf[javadsl.Sink[_, _]]
 
   val sFlow = classOf[scaladsl.Flow[_, _, _]]
-  val jFlow = classOf[javadsl.Flow[_, _, _]]
 
   val sRunnableGraph = classOf[scaladsl.RunnableGraph[_]]
-  val jRunnableGraph = classOf[javadsl.RunnableGraph[_]]
 
   val graph = classOf[Graph[_, _]]
 
@@ -65,37 +57,6 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
 
     def apply(name: String, sClass: Class[_], jClass: Class[_]): TestCase =
       TestCase(name, Some(sClass), Some(jClass), None)
-  }
-
-  val testCases = Seq(
-    TestCase("Source", scaladsl.Source.getClass, javadsl.Source.getClass),
-    TestCase("Flow", scaladsl.Flow.getClass, javadsl.Flow.getClass),
-    TestCase("Sink", scaladsl.Sink.getClass, javadsl.Sink.getClass),
-    TestCase("BidiFlow", scaladsl.BidiFlow.getClass, javadsl.BidiFlow.getClass),
-    TestCase("GraphDSL", scaladsl.GraphDSL.getClass, javadsl.GraphDSL.getClass, classOf[javadsl.GraphCreate]),
-    TestCase("ZipWith", Some(scaladsl.ZipWith.getClass), None, Some(javadsl.ZipWith.getClass)),
-    TestCase("Merge", scaladsl.Merge.getClass, javadsl.Merge.getClass),
-    TestCase("MergePreferred", scaladsl.MergePreferred.getClass, javadsl.MergePreferred.getClass),
-    TestCase("Broadcast", scaladsl.Broadcast.getClass, javadsl.Broadcast.getClass),
-    TestCase("Balance", scaladsl.Balance.getClass, javadsl.Balance.getClass),
-    TestCase("Zip", scaladsl.Zip.getClass, javadsl.Zip.getClass),
-    TestCase("UnZip", scaladsl.Unzip.getClass, javadsl.Unzip.getClass),
-    TestCase("Concat", scaladsl.Concat.getClass, javadsl.Concat.getClass),
-    TestCase("FileIO", scaladsl.FileIO.getClass, javadsl.FileIO.getClass),
-    TestCase("StreamConverters", scaladsl.StreamConverters.getClass, javadsl.StreamConverters.getClass))
-
-  "Java DSL" must provide {
-    testCases foreach {
-      case TestCase(name, Some(sClass), jClass, jFactoryOption) ⇒
-        name which {
-          s"allows creating the same ${name}s as Scala DSL" in {
-            runSpec(
-              getSMethods(sClass),
-              jClass.toList.flatMap(getJMethods) ++
-                jFactoryOption.toList.flatMap(f ⇒ getJMethods(f).map(unspecializeName andThen curryLikeJava)))
-          }
-        }
-    }
   }
 
   // here be dragons...
@@ -228,11 +189,11 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
    * If scaladsl is not a keyed type, javadsl shouldn't be as well.
    */
   def returnTypeMatch(s: Class[_], j: Class[_]): Boolean =
-    (sSource.isAssignableFrom(s) && jSource.isAssignableFrom(j)) ||
-      (sSink.isAssignableFrom(s) && jSink.isAssignableFrom(j)) ||
-      (sFlow.isAssignableFrom(s) && jFlow.isAssignableFrom(j)) ||
-      (sRunnableGraph.isAssignableFrom(s) && jRunnableGraph.isAssignableFrom(j)) ||
-      (graph.isAssignableFrom(s) && graph.isAssignableFrom(j))
+    sSource.isAssignableFrom(s) ||
+      sSink.isAssignableFrom(s) ||
+      sFlow.isAssignableFrom(s) ||
+      sRunnableGraph.isAssignableFrom(s) ||
+      graph.isAssignableFrom(s)
 
   def typeMatch(scalaParams: List[Class[_]], javaParams: List[Class[_]]): Boolean =
     (scalaParams.toList, javaParams.toList) match {

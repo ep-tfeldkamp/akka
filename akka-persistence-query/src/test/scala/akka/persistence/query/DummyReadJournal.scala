@@ -22,11 +22,6 @@ object DummyReadJournal {
   final val Identifier = "akka.persistence.query.journal.dummy"
 }
 
-class DummyReadJournalForJava(readJournal: DummyReadJournal) extends javadsl.ReadJournal with javadsl.AllPersistenceIdsQuery {
-  override def allPersistenceIds(): akka.stream.javadsl.Source[String, NotUsed] =
-    readJournal.allPersistenceIds().asJava
-}
-
 object DummyReadJournalProvider {
   final val config: Config = ConfigFactory.parseString(
     s"""
@@ -49,9 +44,6 @@ class DummyReadJournalProvider extends ReadJournalProvider {
 
   override val scaladslReadJournal: DummyReadJournal =
     new DummyReadJournal
-
-  override val javadslReadJournal: DummyReadJournalForJava =
-    new DummyReadJournalForJava(scaladslReadJournal)
 }
 
 class DummyReadJournalProvider2(sys: ExtendedActorSystem) extends DummyReadJournalProvider

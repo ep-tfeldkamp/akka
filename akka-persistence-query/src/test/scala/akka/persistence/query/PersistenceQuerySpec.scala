@@ -49,7 +49,6 @@ class PersistenceQuerySpec extends WordSpecLike with Matchers with BeforeAndAfte
   private def withActorSystem(conf: String = "")(block: ActorSystem ⇒ Unit): Unit = {
     val config =
       DummyReadJournalProvider.config
-        .withFallback(DummyJavaReadJournalProvider.config)
         .withFallback(ConfigFactory.parseString(conf))
         .withFallback(ConfigFactory.parseString(eventAdaptersConfig))
         .withFallback(ConfigFactory.load())

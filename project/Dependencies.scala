@@ -17,7 +17,7 @@ object Dependencies {
   val aeronVersion = "1.2.5-dg-1.0.0"
 
   val Versions = Seq(
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    crossScalaVersions := Seq("2.11.11", "2.12.4"),
     scalaVersion := System.getProperty("akka.build.scalaVersion", crossScalaVersions.value.head),
     scalaStmVersion := sys.props.get("akka.build.scalaStmVersion").getOrElse("0.8"),
     scalaCheckVersion := sys.props.get("akka.build.scalaCheckVersion").getOrElse(
@@ -64,11 +64,6 @@ object Dependencies {
     
     // For akka-http-testkit-java
     val junit       = "junit"                         % "junit"                        % junitVersion  // Common Public License 1.0
-
-    // For Java 8 Conversions
-    val dasgipJava8Compat = "com.dasgip"                    % "java8-compat"                 % "0.1.0"       % "compile"
-    val aeronDriver       = "io.aeron"                      % "aeron-driver"                 % aeronVersion  // ApacheV2
-    val aeronClient       = "io.aeron"                      % "aeron-client"                 % aeronVersion  // ApacheV2
 
     object Docs {
       val sprayJson   = "io.spray"                   %%  "spray-json"                  % "1.3.2"             % "test"
@@ -136,7 +131,7 @@ object Dependencies {
 
   val actorTests = l ++= Seq(Test.junit, Test.scalatest.value, Test.commonsCodec, Test.commonsMath, Test.mockito, Test.scalacheck.value, Test.junitIntf)
 
-  val remote = l ++= Seq(netty, uncommonsMath, dasgipJava8Compat, aeronDriver, aeronClient, Test.junit, Test.scalatest.value, Test.jimfs)
+  val remote = l ++= Seq(netty, uncommonsMath, Test.junit, Test.scalatest.value, Test.jimfs)
 
   val remoteTests = l ++= Seq(Test.junit, Test.scalatest.value, Test.scalaXml)
 

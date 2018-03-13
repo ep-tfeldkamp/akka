@@ -39,9 +39,6 @@ object PersistenceQueryDocSpec {
 
     override val scaladslReadJournal: MyScaladslReadJournal =
       new MyScaladslReadJournal(system, config)
-
-    override val javadslReadJournal: MyJavadslReadJournal =
-      new MyJavadslReadJournal(scaladslReadJournal)
   }
 
   class MyScaladslReadJournal(system: ExtendedActorSystem, config: Config)
@@ -94,38 +91,6 @@ object PersistenceQueryDocSpec {
       ???
     }
 
-  }
-
-  class MyJavadslReadJournal(scaladslReadJournal: MyScaladslReadJournal)
-    extends akka.persistence.query.javadsl.ReadJournal
-    with akka.persistence.query.javadsl.EventsByTagQuery2
-    with akka.persistence.query.javadsl.EventsByPersistenceIdQuery
-    with akka.persistence.query.javadsl.AllPersistenceIdsQuery
-    with akka.persistence.query.javadsl.CurrentPersistenceIdsQuery {
-
-    override def eventsByTag(
-      tag: String, offset: Offset = Sequence(0L)): javadsl.Source[EventEnvelope2, NotUsed] =
-      scaladslReadJournal.eventsByTag(tag, offset).asJava
-
-    override def eventsByPersistenceId(
-      persistenceId: String, fromSequenceNr: Long = 0L,
-      toSequenceNr: Long = Long.MaxValue): javadsl.Source[EventEnvelope, NotUsed] =
-      scaladslReadJournal.eventsByPersistenceId(
-        persistenceId, fromSequenceNr, toSequenceNr).asJava
-
-    override def allPersistenceIds(): javadsl.Source[String, NotUsed] =
-      scaladslReadJournal.allPersistenceIds().asJava
-
-    override def currentPersistenceIds(): javadsl.Source[String, NotUsed] =
-      scaladslReadJournal.currentPersistenceIds().asJava
-
-    // possibility to add more plugin specific queries
-
-    def byTagsWithMeta(
-      tags: java.util.Set[String]): javadsl.Source[RichEvent, QueryMetadata] = {
-      import scala.collection.JavaConverters._
-      scaladslReadJournal.byTagsWithMeta(tags.asScala.toSet).asJava
-    }
   }
 
   //#my-read-journal

@@ -25,7 +25,7 @@ object PersistenceQuery extends ExtensionId[PersistenceQuery] with ExtensionIdPr
 
   /** INTERNAL API. */
   private[persistence] case class PluginHolder(
-    scaladslPlugin: scaladsl.ReadJournal, javadslPlugin: akka.persistence.query.javadsl.ReadJournal)
+    scaladslPlugin: scaladsl.ReadJournal)
     extends Extension
 
 }
@@ -45,13 +45,6 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
   final def readJournalFor[T <: scaladsl.ReadJournal](readJournalPluginId: String): T =
     readJournalPluginFor(readJournalPluginId).scaladslPlugin.asInstanceOf[T]
 
-  /**
-   * Java API: Returns the [[akka.persistence.query.javadsl.ReadJournal]] specified by the given
-   * read journal configuration entry.
-   */
-  final def getReadJournalFor[T <: javadsl.ReadJournal](clazz: Class[T], readJournalPluginId: String): T =
-    readJournalPluginFor(readJournalPluginId).javadslPlugin.asInstanceOf[T]
-
   @tailrec private def readJournalPluginFor(readJournalPluginId: String): PluginHolder = {
     val configPath = readJournalPluginId
     val extensionIdMap = readJournalPluginExtensionIds.get
@@ -62,7 +55,7 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
         val extensionId = new ExtensionId[PluginHolder] {
           override def createExtension(system: ExtendedActorSystem): PluginHolder = {
             val provider = createPlugin(configPath)
-            PluginHolder(provider.scaladslReadJournal(), provider.javadslReadJournal())
+            PluginHolder(provider.scaladslReadJournal())
           }
         }
         readJournalPluginExtensionIds.compareAndSet(extensionIdMap, extensionIdMap.updated(configPath, extensionId))

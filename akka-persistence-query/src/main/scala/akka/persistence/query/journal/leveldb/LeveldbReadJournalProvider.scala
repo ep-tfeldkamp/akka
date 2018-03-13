@@ -12,7 +12,4 @@ class LeveldbReadJournalProvider(system: ExtendedActorSystem, config: Config) ex
   override val scaladslReadJournal: scaladsl.LeveldbReadJournal =
     new scaladsl.LeveldbReadJournal(system, config)
 
-  override val javadslReadJournal: javadsl.LeveldbReadJournal =
-    new javadsl.LeveldbReadJournal(scaladslReadJournal)
-
 }

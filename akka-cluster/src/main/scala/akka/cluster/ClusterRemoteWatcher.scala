@@ -52,7 +52,6 @@ private[cluster] class ClusterRemoteWatcher(
     unreachableReaperInterval,
     heartbeatExpectedResponseAfter) {
 
-  private val arteryEnabled = RARP(context.system).provider.remoteSettings.Artery.Enabled
   val cluster = Cluster(context.system)
   import cluster.selfAddress
 
@@ -97,11 +96,6 @@ private[cluster] class ClusterRemoteWatcher(
 
       if (previousStatus == MemberStatus.Down) {
         quarantine(m.address, Some(m.uniqueAddress.longUid), s"Cluster member removed, previous status [$previousStatus]")
-      } else if (arteryEnabled) {
-        // don't quarantine gracefully removed members (leaving) directly,
-        // give Cluster Singleton some time to exchange TakeOver/HandOver messages.
-        import context.dispatcher
-        context.system.scheduler.scheduleOnce(cluster.settings.QuarantineRemovedNodeAfter, self, DelayedQuarantine(m, previousStatus))
       }
 
       publishAddressTerminated(m.address)

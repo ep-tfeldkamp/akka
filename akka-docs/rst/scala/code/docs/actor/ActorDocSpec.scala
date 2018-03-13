@@ -32,7 +32,6 @@ class MyActor extends Actor {
 }
 //#my-actor
 
-final case class DoIt(msg: ImmutableMessage)
 final case class Message(s: String)
 
 //#context-actorOf

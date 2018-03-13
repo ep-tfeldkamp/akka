@@ -30,9 +30,7 @@ object ClusterDomainEventPublisherSpec {
 class ClusterDomainEventPublisherSpec extends AkkaSpec(ClusterDomainEventPublisherSpec.config)
   with BeforeAndAfterEach with ImplicitSender {
 
-  val protocol =
-    if (RARP(system).provider.remoteSettings.Artery.Enabled) "akka"
-    else "akka.tcp"
+  val protocol = "akka.tcp"
 
   var publisher: ActorRef = _
   val aUp = TestMember(Address(protocol, "sys", "a", 2552), Up)
