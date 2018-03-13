@@ -19,6 +19,8 @@ import akka.util.Helpers
 import akka.util.Timeout
 import akka.dispatch.ExecutionContexts
 
+import scala.language.implicitConversions
+
 /**
  * An ActorSelection is a logical view of a section of an ActorSystem's tree of Actors,
  * allowing for broadcasting of messages to that section.

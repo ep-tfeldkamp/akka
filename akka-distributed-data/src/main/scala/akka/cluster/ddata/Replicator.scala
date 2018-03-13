@@ -38,7 +38,6 @@ import java.util.function.{ Function ⇒ JFunction }
 import akka.dispatch.Dispatchers
 import akka.actor.DeadLetterSuppression
 import akka.cluster.ddata.Key.KeyR
-import java.util.Optional
 import akka.cluster.ddata.DurableStore._
 import akka.actor.ExtendedActorSystem
 import akka.actor.SupervisorStrategy
@@ -265,20 +264,10 @@ object Replicator {
      * Java API: `Get` value from local `Replicator`, i.e. `ReadLocal` consistency.
      */
     def this(key: Key[A], consistency: ReadConsistency) = this(key, consistency, None)
-
-    /**
-     * Java API: `Get` value from local `Replicator`, i.e. `ReadLocal` consistency.
-     */
-    def this(key: Key[A], consistency: ReadConsistency, request: Optional[Any]) =
-      this(key, consistency, Option(request.orElse(null)))
-
   }
   sealed abstract class GetResponse[A <: ReplicatedData] extends NoSerializationVerificationNeeded {
     def key: Key[A]
     def request: Option[Any]
-
-    /** Java API */
-    def getRequest: Optional[Any] = Optional.ofNullable(request.orNull)
   }
   /**
    * Reply from `Get`. The data value is retrieved with [[#get]] using the typed key.
@@ -393,41 +382,11 @@ object Replicator {
   final case class Update[A <: ReplicatedData](key: Key[A], writeConsistency: WriteConsistency,
                                                request: Option[Any])(val modify: Option[A] ⇒ A)
     extends Command[A] with NoSerializationVerificationNeeded {
-
-    /**
-     * Java API: Modify value of local `Replicator` and replicate with given `writeConsistency`.
-     *
-     * The current value for the `key` is passed to the `modify` function.
-     * If there is no current data value for the `key` the `initial` value will be
-     * passed to the `modify` function.
-     */
-    def this(
-      key: Key[A], initial: A, writeConsistency: WriteConsistency, modify: JFunction[A, A]) =
-      this(key, writeConsistency, None)(Update.modifyWithInitial(initial, data ⇒ modify.apply(data)))
-
-    /**
-     * Java API: Modify value of local `Replicator` and replicate with given `writeConsistency`.
-     *
-     * The current value for the `key` is passed to the `modify` function.
-     * If there is no current data value for the `key` the `initial` value will be
-     * passed to the `modify` function.
-     *
-     * The optional `request` context is included in the reply messages. This is a convenient
-     * way to pass contextual information (e.g. original sender) without having to use `ask`
-     * or local correlation data structures.
-     */
-    def this(
-      key: Key[A], initial: A, writeConsistency: WriteConsistency, request: Optional[Any], modify: JFunction[A, A]) =
-      this(key, writeConsistency, Option(request.orElse(null)))(Update.modifyWithInitial(initial, data ⇒ modify.apply(data)))
-
   }
 
   sealed abstract class UpdateResponse[A <: ReplicatedData] extends NoSerializationVerificationNeeded {
     def key: Key[A]
     def request: Option[Any]
-
-    /** Java API */
-    def getRequest: Optional[Any] = Optional.ofNullable(request.orNull)
   }
   final case class UpdateSuccess[A <: ReplicatedData](key: Key[A], request: Option[Any]) extends UpdateResponse[A]
   sealed abstract class UpdateFailure[A <: ReplicatedData] extends UpdateResponse[A]

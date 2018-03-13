@@ -3,8 +3,7 @@
  */
 package akka.stream.impl.io
 
-import java.io.InputStream
-import java.nio.file.Path
+import java.io.{ File, InputStream }
 
 import akka.stream._
 import akka.stream.ActorAttributes.Dispatcher
@@ -14,13 +13,14 @@ import akka.stream.impl.Stages.DefaultAttributes.IODispatcher
 import akka.stream.impl.{ ErrorPublisher, SourceModule }
 import akka.util.ByteString
 import org.reactivestreams._
+
 import scala.concurrent.{ Future, Promise }
 
 /**
  * INTERNAL API
  * Creates simple synchronous Source backed by the given file.
  */
-private[akka] final class FileSource(f: Path, chunkSize: Int, startPosition: Long, val attributes: Attributes, shape: SourceShape[ByteString])
+private[akka] final class FileSource(f: File, chunkSize: Int, startPosition: Long, val attributes: Attributes, shape: SourceShape[ByteString])
   extends SourceModule[ByteString, Future[IOResult]](shape) {
   require(chunkSize > 0, "chunkSize must be greater than 0")
   require(startPosition >= 0, "startPosition must be equal or greater than 0")

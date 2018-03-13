@@ -9,21 +9,8 @@ import akka.persistence.SnapshotMetadata;
 import akka.persistence.SnapshotSelectionCriteria;
 import scala.concurrent.Future;
 
-import java.util.Optional;
-
 interface SnapshotStorePlugin {
   //#snapshot-store-plugin-api
-  /**
-   * Java API, Plugin API: asynchronously loads a snapshot.
-   *
-   * @param persistenceId
-   *          id of the persistent actor.
-   * @param criteria
-   *          selection criteria for loading.
-   */
-  Future<Optional<SelectedSnapshot>> doLoadAsync(String persistenceId, 
-      SnapshotSelectionCriteria criteria);
-
   /**
    * Java API, Plugin API: asynchronously saves a snapshot.
    *

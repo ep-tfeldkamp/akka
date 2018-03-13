@@ -6,7 +6,6 @@ package akka.cluster
 import java.util.concurrent.ThreadLocalRandom
 
 import akka.actor.{ ActorSystem, Address }
-import akka.remote.RARP
 import akka.remote.testkit.{ MultiNodeConfig, MultiNodeSpec }
 import akka.testkit._
 import com.typesafe.config.ConfigFactory

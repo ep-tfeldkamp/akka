@@ -3,8 +3,8 @@
  */
 package akka.stream.impl.io
 
+import java.io.{ File, FileOutputStream }
 import java.nio.channels.FileChannel
-import java.nio.file.{ Path, OpenOption }
 
 import akka.Done
 import akka.actor.{ ActorLogging, Deploy, Props }
@@ -19,15 +19,15 @@ import scala.util.{ Failure, Success }
 
 /** INTERNAL API */
 @InternalApi private[akka] object FileSubscriber {
-  def props(f: Path, completionPromise: Promise[IOResult], bufSize: Int, startPosition: Long, openOptions: Set[OpenOption]) = {
+  def props(f: File, completionPromise: Promise[IOResult], bufSize: Int, startPosition: Long) = {
     require(bufSize > 0, "buffer size must be > 0")
     require(startPosition >= 0, s"startPosition must be >= 0 (was $startPosition)")
-    Props(classOf[FileSubscriber], f, completionPromise, bufSize, startPosition, openOptions).withDeploy(Deploy.local)
+    Props(classOf[FileSubscriber], f, completionPromise, bufSize, startPosition).withDeploy(Deploy.local)
   }
 }
 
 /** INTERNAL API */
-@InternalApi private[akka] class FileSubscriber(f: Path, completionPromise: Promise[IOResult], bufSize: Int, startPosition: Long, openOptions: Set[OpenOption])
+@InternalApi private[akka] class FileSubscriber(f: File, completionPromise: Promise[IOResult], bufSize: Int, startPosition: Long)
   extends akka.stream.actor.ActorSubscriber
   with ActorLogging {
 
@@ -38,7 +38,7 @@ import scala.util.{ Failure, Success }
   private var bytesWritten: Long = 0
 
   override def preStart(): Unit = try {
-    chan = FileChannel.open(f, openOptions.asJava)
+    chan = new FileOutputStream(f).getChannel
     if (startPosition > 0) {
       chan.position(startPosition)
     }

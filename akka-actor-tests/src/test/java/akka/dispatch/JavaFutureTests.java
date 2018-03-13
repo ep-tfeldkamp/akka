@@ -247,27 +247,6 @@ public class JavaFutureTests extends JUnitSuite {
   }
 
   @Test
-  public void findForJavaApiMustWork() throws Exception{
-    LinkedList<Future<Integer>> listFutures = new LinkedList<Future<Integer>>();
-    for (int i = 0; i < 10; i++) {
-      final Integer fi = i;
-      listFutures.add(Futures.future(new Callable<Integer>() {
-        public Integer call() {
-          return fi;
-        }
-      }, system.dispatcher()));
-    }
-    final Integer expect = 5;
-    Future<Option<Integer>> f = Futures.find(listFutures, new Function<Integer, Boolean>() {
-      public Boolean apply(Integer i) {
-        return i == 5;
-      }
-    }, system.dispatcher());
-
-    assertEquals(expect, Await.result(f, timeout).get());
-  }
-
-  @Test
   public void blockMustBeCallable() throws Exception {
     Promise<String> p = Futures.promise();
     Duration d = Duration.create(1, TimeUnit.SECONDS);

@@ -3,8 +3,6 @@
  */
 package akka.stream
 
-import java.util.Optional
-
 import akka.event.Logging
 import scala.annotation.tailrec
 import scala.reflect.{ classTag, ClassTag }
@@ -50,7 +48,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
    * If no such attribute exists the `default` value is returned.
    */
   def getAttribute[T <: Attribute](c: Class[T], default: T): T =
-    getAttribute(c).orElse(default)
+    getAttribute(c).getOrElse(default)
 
   /**
    * Java API: Get the first (least specific) attribute of a given `Class` or subclass thereof.
@@ -62,8 +60,8 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
    * Java API: Get the last (most specific) attribute of a given `Class` or subclass thereof.
    */
-  def getAttribute[T <: Attribute](c: Class[T]): Optional[T] =
-    Optional.ofNullable(attributeList.foldLeft(
+  def getAttribute[T <: Attribute](c: Class[T]): Option[T] =
+    Option(attributeList.foldLeft(
       null.asInstanceOf[T])(
       (acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
 
@@ -187,7 +185,7 @@ object Attributes {
 
   /**
    * Specifies the name of the operation.
-   * If the name is null or empty the name is ignored, i.e. [[#none]] is returned.
+   * If the name is null or empty the name is ignored, i.e. [[none]] is returned.
    */
   def name(name: String): Attributes =
     if (name == null || name.isEmpty) none
@@ -260,7 +258,7 @@ object ActorAttributes {
    * Java API: Decides how exceptions from application code are to be handled.
    */
   def withSupervisionStrategy(decider: function.Function[Throwable, Supervision.Directive]): Attributes =
-    ActorAttributes.supervisionStrategy(decider.apply _)
+    ActorAttributes.supervisionStrategy(decider.apply)
 
   /**
    * Java API

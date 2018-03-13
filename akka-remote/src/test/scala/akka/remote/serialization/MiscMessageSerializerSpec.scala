@@ -5,13 +5,12 @@
 package akka.remote.serialization
 
 import akka.actor._
-import akka.remote.{ MessageSerializer, RemoteWatcher }
+import akka.remote.RemoteWatcher
 import akka.serialization.SerializationExtension
 import akka.testkit.AkkaSpec
 import com.typesafe.config.ConfigFactory
 
 import scala.util.control.NoStackTrace
-import java.util.Optional
 import java.io.NotSerializableException
 
 object MiscMessageSerializerSpec {
@@ -79,8 +78,6 @@ class MiscMessageSerializerSpec extends AkkaSpec(MiscMessageSerializerSpec.testC
       "ActorRef" → ref,
       "Some" → Some("value"),
       "None" → None,
-      "Optional.present" → Optional.of("value2"),
-      "Optional.empty" → Optional.empty(),
       "Kill" → Kill,
       "PoisonPill" → PoisonPill,
       "RemoteWatcher.Heartbeat" → RemoteWatcher.Heartbeat,

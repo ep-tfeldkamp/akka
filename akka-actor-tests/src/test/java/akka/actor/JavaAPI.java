@@ -54,11 +54,6 @@ public class JavaAPI extends JUnitSuite {
     final ActorPath p = ActorPaths.fromString("akka.tcp://Sys@localhost:1234/user/abc");
   }
 
-  @Test
-  public void mustBeAbleToCreateActorRefFromClass() {
-    ActorRef ref = system.actorOf(Props.create(JavaAPITestActor.class));
-    assertNotNull(ref);
-  }
 
   public static Props mkProps() {
     return Props.create(new Creator<Actor>() {
@@ -138,15 +133,6 @@ public class JavaAPI extends JUnitSuite {
     Tuple22.create(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
   }
   
-  @Test
-  public void mustBeAbleToCreateOptionFromOptional() {
-    Option<Object> empty = Util.option(Optional.ofNullable(null));
-    assertTrue(empty.isEmpty());
-
-    Option<String> full = Util.option(Optional.ofNullable("hello"));
-    assertTrue(full.isDefined());
-  }
-
   public static class ActorWithConstructorParams extends UntypedActor {
 
     private final String a;

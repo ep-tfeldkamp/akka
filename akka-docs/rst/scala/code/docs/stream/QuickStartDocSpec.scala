@@ -14,11 +14,12 @@ import akka.actor.ActorSystem
 import akka.util.ByteString
 import scala.concurrent._
 import scala.concurrent.duration._
-import java.nio.file.Paths
+import java.io.File
 //#other-imports
 
 import org.scalatest._
 import org.scalatest.concurrent._
+
 
 class QuickStartDocSpec extends WordSpec with BeforeAndAfterAll with ScalaFutures {
   implicit val patience = PatienceConfig(5.seconds)
@@ -49,7 +50,7 @@ class QuickStartDocSpec extends WordSpec with BeforeAndAfterAll with ScalaFuture
     val result: Future[IOResult] =
       factorials
         .map(num => ByteString(s"$num\n"))
-        .runWith(FileIO.toPath(Paths.get("factorials.txt")))
+        .runWith(FileIO.toFile(new File("factorials.txt")))
     //#transform-source
 
     //#use-transformed-sink
@@ -74,7 +75,7 @@ class QuickStartDocSpec extends WordSpec with BeforeAndAfterAll with ScalaFuture
   def lineSink(filename: String): Sink[String, Future[IOResult]] =
     Flow[String]
       .map(s => ByteString(s + "\n"))
-      .toMat(FileIO.toPath(Paths.get(filename)))(Keep.right)
+      .toMat(FileIO.toFile(new File(filename)))(Keep.right)
   //#transform-sink
 
 }

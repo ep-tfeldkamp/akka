@@ -4,7 +4,6 @@
 package akka.cluster.sharding
 
 import java.net.URLEncoder
-import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.Await
 import akka.actor.Actor
@@ -174,7 +173,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
   /**
    * Scala API: Register a named entity type by defining the [[akka.actor.Props]] of the entity actor
    * and functions to extract entity and shard identifier from messages. The [[ShardRegion]] actor
-   * for this type can later be retrieved with the [[#shardRegion]] method.
+   * for this type can later be retrieved with the [[shardRegion]] method.
    *
    * Some settings can be configured as described in the `akka.cluster.sharding` section
    * of the `reference.conf`.
@@ -214,7 +213,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
   /**
    * Register a named entity type by defining the [[akka.actor.Props]] of the entity actor and
    * functions to extract entity and shard identifier from messages. The [[ShardRegion]] actor
-   * for this type can later be retrieved with the [[#shardRegion]] method.
+   * for this type can later be retrieved with the [[shardRegion]] method.
    *
    * The default shard allocation strategy [[ShardCoordinator.LeastShardAllocationStrategy]]
    * is used. [[akka.actor.PoisonPill]] is used as `handOffStopMessage`.
@@ -249,7 +248,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
   /**
    * Java/Scala API: Register a named entity type by defining the [[akka.actor.Props]] of the entity actor
    * and functions to extract entity and shard identifier from messages. The [[ShardRegion]] actor
-   * for this type can later be retrieved with the [[#shardRegion]] method.
+   * for this type can later be retrieved with the [[shardRegion]] method.
    *
    * Some settings can be configured as described in the `akka.cluster.sharding` section
    * of the `reference.conf`.
@@ -286,7 +285,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
   /**
    * Java/Scala API: Register a named entity type by defining the [[akka.actor.Props]] of the entity actor
    * and functions to extract entity and shard identifier from messages. The [[ShardRegion]] actor
-   * for this type can later be retrieved with the [[#shardRegion]] method.
+   * for this type can later be retrieved with the [[shardRegion]] method.
    *
    * The default shard allocation strategy [[ShardCoordinator.LeastShardAllocationStrategy]]
    * is used. [[akka.actor.PoisonPill]] is used as `handOffStopMessage`.
@@ -318,7 +317,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
    * Scala API: Register a named entity type `ShardRegion` on this node that will run in proxy only mode,
    * i.e. it will delegate messages to other `ShardRegion` actors on other nodes, but not host any
    * entity actors itself. The [[ShardRegion]] actor for this type can later be retrieved with the
-   * [[#shardRegion]] method.
+   * [[shardRegion]] method.
    *
    * Some settings can be configured as described in the `akka.cluster.sharding` section
    * of the `reference.conf`.
@@ -351,7 +350,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
    * Java/Scala API: Register a named entity type `ShardRegion` on this node that will run in proxy only mode,
    * i.e. it will delegate messages to other `ShardRegion` actors on other nodes, but not host any
    * entity actors itself. The [[ShardRegion]] actor for this type can later be retrieved with the
-   * [[#shardRegion]] method.
+   * [[shardRegion]] method.
    *
    * Some settings can be configured as described in the `akka.cluster.sharding` section
    * of the `reference.conf`.
@@ -365,10 +364,12 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
    */
   def startProxy(
     typeName:         String,
-    role:             Optional[String],
+    role:             Option[String],
     messageExtractor: ShardRegion.MessageExtractor): ActorRef = {
 
-    startProxy(typeName, Option(role.orElse(null)),
+    startProxy(
+      typeName,
+      role,
       extractEntityId = {
       case msg if messageExtractor.entityId(msg) ne null ⇒
         (messageExtractor.entityId(msg), messageExtractor.entityMessage(msg))
@@ -379,7 +380,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
 
   /**
    * Retrieve the actor reference of the [[ShardRegion]] actor responsible for the named entity type.
-   * The entity type must be registered with the [[#start]] method before it can be used here.
+   * The entity type must be registered with the [[start]] method before it can be used here.
    * Messages to the entity is always sent via the `ShardRegion`.
    */
   def shardRegion(typeName: String): ActorRef = regions.get(typeName) match {

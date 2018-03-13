@@ -168,14 +168,6 @@ object Option {
   def option[A](v: A): Option[A] = if (v == null) none else some(v)
 
   /**
-   * Converts a Scala Option to a Java Option
-   */
-  def fromScalaOption[T](scalaOption: scala.Option[T]): Option[T] = scalaOption match {
-    case scala.Some(r) ⇒ some(r)
-    case scala.None    ⇒ none
-  }
-
-  /**
    * Class <code>Some[A]</code> represents existing values of type
    * <code>A</code>.
    */
@@ -253,8 +245,4 @@ object Util {
   def immutableIndexedSeq[T](iterable: java.lang.Iterable[T]): immutable.IndexedSeq[T] =
     immutableSeq(iterable).toVector
 
-  // TODO in case we decide to pull in scala-java8-compat methods below could be removed - https://github.com/akka/akka/issues/16247
-
-  def option[T](jOption: java.util.Optional[T]): scala.Option[T] =
-    scala.Option(jOption.orElse(null.asInstanceOf[T]))
 }

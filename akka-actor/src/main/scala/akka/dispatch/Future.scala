@@ -123,14 +123,6 @@ object Futures {
   }
 
   /**
-   * Returns a Future that will hold the optional result of the first Future with a result that matches the predicate
-   */
-  def find[T <: AnyRef](futures: JIterable[Future[T]], predicate: JFunc[T, java.lang.Boolean], executor: ExecutionContext): Future[JOption[T]] = {
-    implicit val ec = executor
-    Future.find[T](futures.asScala)(predicate.apply(_))(executor) map JOption.fromScalaOption
-  }
-
-  /**
    * Returns a Future to the result of the first future in the list that is completed
    */
   def firstCompletedOf[T <: AnyRef](futures: JIterable[Future[T]], executor: ExecutionContext): Future[T] =

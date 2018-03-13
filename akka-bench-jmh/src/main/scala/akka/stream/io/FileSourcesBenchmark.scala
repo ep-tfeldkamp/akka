@@ -4,7 +4,7 @@
 
 package akka.stream.io
 
-import java.nio.file.{ Files, Path }
+import java.io.{ FileInputStream, File }
 import java.util.concurrent.TimeUnit
 import akka.{ Done, NotUsed }
 import akka.actor.ActorSystem
@@ -28,14 +28,15 @@ class FileSourcesBenchmark {
   implicit val system = ActorSystem("file-sources-benchmark")
   implicit val materializer = ActorMaterializer()
 
-  val file: Path = {
+  val file: File = {
     val line = ByteString("x" * 2048 + "\n")
 
-    val f = Files.createTempFile(getClass.getName, ".bench.tmp")
+    val f = File.createTempFile(getClass.getName, ".bench.tmp")
+    f.deleteOnExit()
 
     val ft = Source.fromIterator(() ⇒ Iterator.continually(line))
       .take(10 * 39062) // adjust as needed
-      .runWith(FileIO.toPath(f))
+      .runWith(FileIO.toFile(f))
     Await.result(ft, 30.seconds)
 
     f
@@ -50,14 +51,14 @@ class FileSourcesBenchmark {
 
   @Setup
   def setup(): Unit = {
-    fileChannelSource = FileIO.fromPath(file, bufSize)
-    fileInputStreamSource = StreamConverters.fromInputStream(() ⇒ Files.newInputStream(file), bufSize)
-    ioSourceLinesIterator = Source.fromIterator(() ⇒ scala.io.Source.fromFile(file.toFile).getLines()).map(ByteString(_))
+    fileChannelSource = FileIO.fromFile(file, bufSize)
+    fileInputStreamSource = StreamConverters.fromInputStream(() ⇒ new FileInputStream(file), bufSize)
+    ioSourceLinesIterator = Source.fromIterator(() ⇒ scala.io.Source.fromFile(file).getLines()).map(ByteString(_))
   }
 
   @TearDown
   def teardown(): Unit = {
-    Files.delete(file)
+    file.delete()
   }
 
   @TearDown

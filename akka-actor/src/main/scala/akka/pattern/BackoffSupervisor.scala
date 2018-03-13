@@ -3,11 +3,8 @@
  */
 package akka.pattern
 
-import java.time.Instant
-
-import scala.concurrent.duration.{ Deadline, Duration, FiniteDuration }
+import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.ThreadLocalRandom
-import java.util.Optional
 
 import akka.actor.Actor
 import akka.actor.ActorRef
@@ -26,7 +23,7 @@ object BackoffSupervisor {
    *
    * Exceptions in the child are handled with the default supervision strategy, i.e.
    * most exceptions will immediately restart the child. You can define another
-   * supervision strategy by using [[#propsWithSupervisorStrategy]].
+   * supervision strategy by using [[propsWithSupervisorStrategy]].
    *
    * @param childProps the [[akka.actor.Props]] of the child actor that
    *   will be started and supervised
@@ -107,7 +104,7 @@ object BackoffSupervisor {
     /**
      * Java API: The `ActorRef` of the current child, if any
      */
-    def getRef: Optional[ActorRef] = Optional.ofNullable(ref.orNull)
+    def getRef: Option[ActorRef] = Option(ref.orNull)
   }
 
   /**
