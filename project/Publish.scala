@@ -16,7 +16,9 @@ object Publish extends AutoPlugin {
   override lazy val projectSettings = Seq(
     crossPaths := false,
     pomExtra := akkaPomExtra,
-    publishTo := akkaPublishTo.value,
+    publishTo := {
+      if (isSnapshot.value) localRepo(defaultPublishTo.value) else Some(artifactoryPublishTo)
+    },
     credentials ++= akkaCredentials,
     organizationName := "Lightbend Inc.",
     organizationHomepage := Some(url("http://www.lightbend.com")),
@@ -41,18 +43,12 @@ object Publish extends AutoPlugin {
     </developers>
   }
 
-  private def akkaPublishTo = Def.setting {
-    sonatypeRepo(version.value) orElse localRepo(defaultPublishTo.value)
-  }
+  def artifactoryPublishTo: Resolver = Resolver.url(
+    "Artifactory third party library releases",
+    new URL(s"http://artifactory.zentrale.local/ext-release-local")
+  )(Resolver.mavenStylePatterns)
 
-  private def sonatypeRepo(version: String): Option[Resolver] =
-    Option(sys.props("publish.maven.central")) filter (_.toLowerCase == "true") map { _ =>
-      val nexus = "https://oss.sonatype.org/"
-      if (version endsWith "-SNAPSHOT") "snapshots" at nexus + "content/repositories/snapshots"
-      else "releases" at nexus + "service/local/staging/deploy/maven2"
-    }
-
-  private def localRepo(repository: File) =
+  private def localRepo(repository: File): Option[Resolver] =
     Some(Resolver.file("Default Local Repository", repository))
 
   private def akkaCredentials: Seq[Credentials] =
