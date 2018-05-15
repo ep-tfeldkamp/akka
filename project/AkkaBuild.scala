@@ -33,7 +33,7 @@ object AkkaBuild extends Build {
   lazy val buildSettings = Dependencies.Versions ++ Seq(
     organization        := "com.typesafe.akka",
     isSnapshot          := false,
-    version             := "2.4.19-dg-1.1.0" + (if (isSnapshot.value) "-SNAPSHOT" else "")
+    version             := "2.4.19-dg-1.1.1" + (if (isSnapshot.value) "-SNAPSHOT" else "")
   )
 
   lazy val rootSettings = parentSettings ++ Release.settings ++
@@ -346,6 +346,14 @@ object AkkaBuild extends Build {
 
   private def allWarnings: Boolean = System.getProperty("akka.allwarnings", "false").toBoolean
 
+  def stripDg(in: String): String = {
+    if (in.contains("-dg-")) {
+      in.substring(0, in.indexOf("-dg-"))
+    } else {
+      in
+    }
+  }
+
   lazy val defaultSettings = resolverSettings ++
     TestExtras.Filter.settings ++
     Protobuf.settings ++ Seq(
@@ -368,7 +376,7 @@ object AkkaBuild extends Build {
     licenses := Seq(("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
     homepage := Some(url("http://akka.io/")),
 
-    apiURL := Some(url(s"http://doc.akka.io/api/akka/${version.value}")),
+    apiURL := Some(url(s"http://doc.akka.io/api/akka/${stripDg(version.value)}")),
 
     initialCommands :=
       """|import language.postfixOps
