@@ -47,10 +47,6 @@ object AkkaBuild {
 
   lazy val defaultSettings = TestExtras.Filter.settings ++
     Protobuf.settings ++ Seq[Setting[_]](
-      publishTo := Some(Resolver.url(
-        "Artifactory ThirdParty releases",
-        new URL("http://artifactory.zentrale.local/ext-release-local")
-      )(Resolver.ivyStylePatterns)),
       // compile options
       scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.8", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint"),
       scalacOptions in Compile ++= (if (allWarnings) Seq("-deprecation") else Nil),
