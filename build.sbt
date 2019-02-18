@@ -17,8 +17,8 @@ initialize := {
 }
 
 akka.AkkaBuild.buildSettings
+
 shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
-resolverSettings
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   actor, actorTests,

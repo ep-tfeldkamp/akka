@@ -122,12 +122,23 @@ private[akka] trait StashSupport {
    */
   private var theStash = Vector.empty[Envelope]
 
+  /** Accessor method for the underlying stash. */
+  protected[this] def getStash: Vector[Envelope] = theStash
+
+  /** Setter method for the underlying stash. */
+  protected[this] def setStash(stash: Vector[Envelope]): Unit = {
+    theStash = stash
+  }
+
   private def actorCell = context.asInstanceOf[ActorCell]
 
   /* The capacity of the stash. Configured in the actor's mailbox or dispatcher config.
    */
   private val capacity: Int =
     context.system.mailboxes.stashCapacity(context.props.dispatcher, context.props.mailbox)
+
+  /** Accessor method for the underlying stash capacity. */
+  protected[this] def stashCapacity: Int = capacity
 
   /**
    * INTERNAL API.
